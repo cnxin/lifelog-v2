@@ -7,6 +7,7 @@ import '../models/lifelog_models.dart';
 import '../providers/providers.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/photo_viewer.dart';
 
 class PlaceDetailPage extends ConsumerWidget {
   final String placeId;
@@ -142,21 +143,32 @@ class _PhotoGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: photos.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8),
-      itemBuilder: (_, index) => ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          color: colors.softPurple,
-          child: _isLocalFile(photos[index])
-              ? Image.file(
-                  File(photos[index]),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Icon(Icons.broken_image_rounded, color: colors.primary),
-                )
-              : Image.network(
-                  photos[index],
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Icon(Icons.broken_image_rounded, color: colors.primary),
-                ),
+      itemBuilder: (_, index) => GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhotoViewer(
+              photos: photos,
+              initialIndex: index,
+            ),
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            color: colors.softPurple,
+            child: _isLocalFile(photos[index])
+                ? Image.file(
+                    File(photos[index]),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(Icons.broken_image_rounded, color: colors.primary),
+                  )
+                : Image.network(
+                    photos[index],
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(Icons.broken_image_rounded, color: colors.primary),
+                  ),
+          ),
         ),
       ),
     );

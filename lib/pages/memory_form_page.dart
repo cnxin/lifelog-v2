@@ -7,6 +7,8 @@ import '../models/lifelog_models.dart';
 import '../providers/providers.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/photo_viewer.dart';
+import '../widgets/custom_datetime_picker.dart';
 import '../services/photo_service.dart';
 
 class MemoryFormPage extends ConsumerStatefulWidget {
@@ -22,6 +24,7 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
   final _content = TextEditingController();
   final _tags = TextEditingController();
   String _date = DateTime.now().toIso8601String().substring(0, 10);
+  TimeOfDay? _time;
   String _mood = '日常';
   String _placeId = '';
   final Set<String> _personIds = {};
@@ -34,7 +37,14 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
     final memory = ref.read(memoriesProvider).valueOrNull?.where((m) => m.id == widget.memoryId).firstOrNull;
     if (memory == null) return;
     _title.text = memory.title; _content.text = memory.content; _tags.text = memory.tags.join('，');
-    setState(() { _date = memory.date; _mood = memory.mood; _placeId = memory.placeId; _personIds.addAll(memory.personIds); _photosPaths = List.from(memory.photos); });
+    final dateTime = DateTime.tryParse(memory.date);
+    setState(() {
+      _date = memory.date.substring(0, 10);
+      if (dateTime != null && memory.date.length > 10) {
+        _time = TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+      }
+      _mood = memory.mood; _placeId = memory.placeId; _personIds.addAll(memory.personIds); _photosPaths = List.from(memory.photos);
+    });
   }
   @override
   void dispose() { _title.dispose(); _content.dispose(); _tags.dispose(); super.dispose(); }
@@ -52,8 +62,19 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
       ])),
       Expanded(child: ListView(padding: const EdgeInsets.fromLTRB(24, 16, 24, 40), children: [
         _Input(label: '标题 *', controller: _title, icon: Icons.title_rounded, colors: colors), const SizedBox(height: 16),
-        Text('日期', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),
-        GlassCard(colors: colors, onTap: _pickDate, child: Row(children: [Icon(Icons.calendar_today_rounded, size: 18, color: colors.primary), const SizedBox(width: 12), Text(_date, style: TextStyle(color: colors.textMain)), const Spacer(), Icon(Icons.chevron_right, color: colors.textSub)])), const SizedBox(height: 16),
+        Text('日期时间', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),
+        GlassCard(colors: colors, onTap: _pickDateTime, child: Row(children: [
+          Icon(Icons.calendar_today_rounded, size: 18, color: colors.primary),
+          const SizedBox(width: 12),
+          Text(
+            _time != null
+                ? '$_date ${_time!.hour.toString().padLeft(2, '0')}:${_time!.minute.toString().padLeft(2, '0')}'
+                : _date,
+            style: TextStyle(color: colors.textMain),
+          ),
+          const Spacer(),
+          Icon(Icons.chevron_right, color: colors.textSub)
+        ])), const SizedBox(height: 16),
         Text('心情', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),
         Consumer(
           builder: (context, ref, child) {
@@ -74,15 +95,35 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
     ]))));
   }
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(_date) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
-    if (picked != null) setState(() => _date = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}');
+  Future<void> _pickDateTime() async {
+    final colors = AppColors.fromStyle(ref.read(themeStyleProvider));
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => CustomDateTimePicker(
+          initialDate: DateTime.tryParse(_date) ?? DateTime.now(),
+          initialTime: _time,
+          colors: colors,
+          onConfirm: (date, time) {
+            setState(() {
+              _date = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+              _time = time;
+            });
+          },
+        ),
+      ),
+    );
   }
 
   void _save() {
     if (_title.text.trim().isEmpty) return;
     final tags = _tags.text.split(RegExp(r'[,，]')).map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-    ref.read(memoriesProvider.notifier).saveMemory(MemoryEvent(id: widget.memoryId ?? const Uuid().v4(), title: _title.text.trim(), date: _date, personIds: _personIds.toList(), placeId: _placeId, mood: _mood, content: _content.text.trim(), tags: tags, photos: _photosPaths));
+    String dateTimeString = _date;
+    if (_time != null) {
+      dateTimeString = '$_date ${_time!.hour.toString().padLeft(2, '0')}:${_time!.minute.toString().padLeft(2, '0')}:00';
+    }
+    ref.read(memoriesProvider.notifier).saveMemory(MemoryEvent(id: widget.memoryId ?? const Uuid().v4(), title: _title.text.trim(), date: dateTimeString, personIds: _personIds.toList(), placeId: _placeId, mood: _mood, content: _content.text.trim(), tags: tags, photos: _photosPaths));
     context.pop();
   }
 
@@ -139,16 +180,27 @@ class _PhotoPicker extends StatelessWidget {
               ),
               itemBuilder: (_, index) => Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      File(photos[index]),
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: colors.softPurple,
-                        child: Icon(Icons.broken_image_rounded, color: colors.primary),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PhotoViewer(
+                          photos: photos,
+                          initialIndex: index,
+                        ),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(photos[index]),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: colors.softPurple,
+                          child: Icon(Icons.broken_image_rounded, color: colors.primary),
+                        ),
                       ),
                     ),
                   ),

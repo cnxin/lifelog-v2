@@ -7,6 +7,7 @@ import '../models/lifelog_models.dart';
 import '../providers/providers.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/photo_viewer.dart';
 import '../services/photo_service.dart';
 
 class PlaceFormPage extends ConsumerStatefulWidget {
@@ -332,16 +333,27 @@ class _PhotoPicker extends StatelessWidget {
               ),
               itemBuilder: (_, index) => Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      File(photos[index]),
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: colors.softPurple,
-                        child: Icon(Icons.broken_image_rounded, color: colors.primary),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PhotoViewer(
+                          photos: photos,
+                          initialIndex: index,
+                        ),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(photos[index]),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: colors.softPurple,
+                          child: Icon(Icons.broken_image_rounded, color: colors.primary),
+                        ),
                       ),
                     ),
                   ),
