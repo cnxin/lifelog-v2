@@ -15,6 +15,15 @@ final contactRemindersEnabledProvider = StateProvider<bool>((ref) => false);
 final memoryReviewRemindersEnabledProvider = StateProvider<bool>((ref) => false);
 final contactIntervalDaysProvider = StateProvider<int>((ref) => 30);
 
+// 提醒时间配置（小时:分钟）
+final birthdayReminderTimeProvider = StateProvider<String>((ref) => '09:00');
+final contactReminderTimeProvider = StateProvider<String>((ref) => '10:00');
+final memoryReviewReminderTimeProvider = StateProvider<String>((ref) => '09:00');
+
+// 自定义关系和心情选项
+final customRelationshipsProvider = StateProvider<List<String>>((ref) => ['朋友', '家人', '同事', '同学', '恋人', '其他']);
+final customMoodsProvider = StateProvider<List<String>>((ref) => ['日常', '开心', '轻松', '愉快', '感动', '难忘']);
+
 final searchQueryProvider = StateProvider<String>((ref) => '');
 final placeSearchQueryProvider = StateProvider<String>((ref) => '');
 final memorySearchQueryProvider = StateProvider<String>((ref) => '');
@@ -56,13 +65,15 @@ class PeopleNotifier extends AsyncNotifier<List<Person>> {
   Future<void> _updateNotifications() async {
     if (ref.read(notificationsEnabledProvider)) {
       final people = state.valueOrNull ?? [];
-      await ref.read(notificationServiceProvider).schedulePersonReminders(people);
+      final reminderTime = ref.read(birthdayReminderTimeProvider);
+      await ref.read(notificationServiceProvider).schedulePersonReminders(people, reminderTime: reminderTime);
     }
     if (ref.read(contactRemindersEnabledProvider)) {
       final people = state.valueOrNull ?? [];
       final memories = ref.read(memoriesProvider).valueOrNull ?? [];
       final intervalDays = ref.read(contactIntervalDaysProvider);
-      await ref.read(notificationServiceProvider).scheduleContactReminders(people, memories, intervalDays);
+      final reminderTime = ref.read(contactReminderTimeProvider);
+      await ref.read(notificationServiceProvider).scheduleContactReminders(people, memories, intervalDays, reminderTime: reminderTime);
     }
   }
 
@@ -142,11 +153,13 @@ class MemoriesNotifier extends AsyncNotifier<List<MemoryEvent>> {
     if (ref.read(contactRemindersEnabledProvider)) {
       final people = ref.read(peopleProvider).valueOrNull ?? [];
       final intervalDays = ref.read(contactIntervalDaysProvider);
-      await ref.read(notificationServiceProvider).scheduleContactReminders(people, memories, intervalDays);
+      final reminderTime = ref.read(contactReminderTimeProvider);
+      await ref.read(notificationServiceProvider).scheduleContactReminders(people, memories, intervalDays, reminderTime: reminderTime);
     }
 
     if (ref.read(memoryReviewRemindersEnabledProvider)) {
-      await ref.read(notificationServiceProvider).scheduleMemoryReviewReminders(memories);
+      final reminderTime = ref.read(memoryReviewReminderTimeProvider);
+      await ref.read(notificationServiceProvider).scheduleMemoryReviewReminders(memories, reminderTime: reminderTime);
     }
   }
 }

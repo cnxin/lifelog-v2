@@ -132,31 +132,55 @@ class SettingsPage extends ConsumerWidget {
               GlassCard(
                 colors: colors,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                onTap: () => _toggleNotifications(context, ref),
-                child: Row(
+                child: Column(
                   children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: colors.softPurple,
-                        borderRadius: BorderRadius.circular(12),
+                    Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: colors.softPurple,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.notifications_rounded,
+                            size: 20,
+                            color: colors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Text('生日和纪念日提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                        ),
+                        Switch(
+                          value: ref.watch(notificationsEnabledProvider),
+                          onChanged: (v) => _toggleNotifications(context, ref),
+                          activeColor: colors.primary,
+                        ),
+                      ],
+                    ),
+                    if (ref.watch(notificationsEnabledProvider)) ...[
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: () => _pickTime(context, ref, birthdayReminderTimeProvider, '生日和纪念日提醒时间'),
+                        child: Row(
+                          children: [
+                            Icon(Icons.access_time, size: 18, color: colors.textSub),
+                            const SizedBox(width: 8),
+                            Text('提醒时间', style: TextStyle(fontSize: 13, color: colors.textSub)),
+                            const Spacer(),
+                            Text(
+                              ref.watch(birthdayReminderTimeProvider),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.primary),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.chevron_right, size: 18, color: colors.textSub),
+                          ],
+                        ),
                       ),
-                      child: Icon(
-                        Icons.notifications_rounded,
-                        size: 20,
-                        color: colors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text('生日和纪念日提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
-                    ),
-                    Switch(
-                      value: ref.watch(notificationsEnabledProvider),
-                      onChanged: (v) => _toggleNotifications(context, ref),
-                      activeColor: colors.primary,
-                    ),
+                      const SizedBox(height: 6),
+                    ],
                   ],
                 ),
               ),
@@ -166,40 +190,83 @@ class SettingsPage extends ConsumerWidget {
               GlassCard(
                 colors: colors,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                onTap: () => _toggleContactReminders(context, ref),
-                child: Row(
+                child: Column(
                   children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: colors.softPurple,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.people_rounded,
-                        size: 20,
-                        color: colors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('定期联系提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
-                          Text(
-                            '超过 ${ref.watch(contactIntervalDaysProvider)} 天未联系时提醒',
-                            style: TextStyle(fontSize: 12, color: colors.textSub),
+                    Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: colors.softPurple,
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          child: Icon(
+                            Icons.people_rounded,
+                            size: 20,
+                            color: colors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('定期联系提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                              Text(
+                                '超过 ${ref.watch(contactIntervalDaysProvider)} 天未联系时提醒',
+                                style: TextStyle(fontSize: 12, color: colors.textSub),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: ref.watch(contactRemindersEnabledProvider),
+                          onChanged: (v) => _toggleContactReminders(context, ref),
+                          activeColor: colors.primary,
+                        ),
+                      ],
+                    ),
+                    if (ref.watch(contactRemindersEnabledProvider)) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Text('联系间隔', style: TextStyle(fontSize: 13, color: colors.textSub)),
+                          Expanded(
+                            child: Slider(
+                              value: ref.watch(contactIntervalDaysProvider).toDouble(),
+                              min: 7,
+                              max: 90,
+                              divisions: 83,
+                              label: '${ref.watch(contactIntervalDaysProvider)} 天',
+                              activeColor: colors.primary,
+                              onChanged: (v) => ref.read(contactIntervalDaysProvider.notifier).state = v.toInt(),
+                              onChangeEnd: (v) => _updateContactReminders(ref),
+                            ),
+                          ),
+                          Text('${ref.watch(contactIntervalDaysProvider)} 天', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.primary)),
                         ],
                       ),
-                    ),
-                    Switch(
-                      value: ref.watch(contactRemindersEnabledProvider),
-                      onChanged: (v) => _toggleContactReminders(context, ref),
-                      activeColor: colors.primary,
-                    ),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () => _pickTime(context, ref, contactReminderTimeProvider, '定期联系提醒时间'),
+                        child: Row(
+                          children: [
+                            Icon(Icons.access_time, size: 18, color: colors.textSub),
+                            const SizedBox(width: 8),
+                            Text('提醒时间', style: TextStyle(fontSize: 13, color: colors.textSub)),
+                            const Spacer(),
+                            Text(
+                              ref.watch(contactReminderTimeProvider),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.primary),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.chevron_right, size: 18, color: colors.textSub),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                    ],
                   ],
                 ),
               ),
@@ -209,7 +276,71 @@ class SettingsPage extends ConsumerWidget {
               GlassCard(
                 colors: colors,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                onTap: () => _toggleMemoryReviewReminders(context, ref),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: colors.softPurple,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 20,
+                            color: colors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('回忆回顾提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                              Text('回顾往年今天的美好时光', style: TextStyle(fontSize: 12, color: colors.textSub)),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: ref.watch(memoryReviewRemindersEnabledProvider),
+                          onChanged: (v) => _toggleMemoryReviewReminders(context, ref),
+                          activeColor: colors.primary,
+                        ),
+                      ],
+                    ),
+                    if (ref.watch(memoryReviewRemindersEnabledProvider)) ...[
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: () => _pickTime(context, ref, memoryReviewReminderTimeProvider, '回忆回顾提醒时间'),
+                        child: Row(
+                          children: [
+                            Icon(Icons.access_time, size: 18, color: colors.textSub),
+                            const SizedBox(width: 8),
+                            Text('提醒时间', style: TextStyle(fontSize: 13, color: colors.textSub)),
+                            const Spacer(),
+                            Text(
+                              ref.watch(memoryReviewReminderTimeProvider),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.primary),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.chevron_right, size: 18, color: colors.textSub),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 测试通知
+              GlassCard(
+                colors: colors,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                onTap: () => _sendTestNotification(context),
                 child: Row(
                   children: [
                     Container(
@@ -220,7 +351,40 @@ class SettingsPage extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        Icons.auto_awesome_rounded,
+                        Icons.notifications_active_rounded,
+                        size: 20,
+                        color: colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text('发送测试通知', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                    ),
+                    Icon(Icons.chevron_right, size: 20, color: colors.textSub),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              _SectionTitle(title: '自定义选项', icon: Icons.tune_rounded, colors: colors),
+              const SizedBox(height: 12),
+
+              // 自定义关系
+              GlassCard(
+                colors: colors,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                onTap: () => _editCustomOptions(context, ref, customRelationshipsProvider, '关系类型'),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: colors.softPurple,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.people_outline_rounded,
                         size: 20,
                         color: colors.primary,
                       ),
@@ -230,16 +394,48 @@ class SettingsPage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('回忆回顾提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
-                          Text('回顾往年今天的美好时光', style: TextStyle(fontSize: 12, color: colors.textSub)),
+                          Text('自定义关系类型', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                          Text('管理人物关系选项', style: TextStyle(fontSize: 12, color: colors.textSub)),
                         ],
                       ),
                     ),
-                    Switch(
-                      value: ref.watch(memoryReviewRemindersEnabledProvider),
-                      onChanged: (v) => _toggleMemoryReviewReminders(context, ref),
-                      activeColor: colors.primary,
+                    Icon(Icons.chevron_right, size: 20, color: colors.textSub),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 自定义心情
+              GlassCard(
+                colors: colors,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                onTap: () => _editCustomOptions(context, ref, customMoodsProvider, '心情标签'),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: colors.softPurple,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.mood_rounded,
+                        size: 20,
+                        color: colors.primary,
+                      ),
                     ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('自定义心情标签', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                          Text('管理记忆心情选项', style: TextStyle(fontSize: 12, color: colors.textSub)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, size: 20, color: colors.textSub),
                   ],
                 ),
               ),
@@ -464,7 +660,8 @@ class SettingsPage extends ConsumerWidget {
       }
       ref.read(notificationsEnabledProvider.notifier).state = true;
       final people = ref.read(peopleProvider).valueOrNull ?? [];
-      await NotificationService().schedulePersonReminders(people);
+      final reminderTime = ref.read(birthdayReminderTimeProvider);
+      await NotificationService().schedulePersonReminders(people, reminderTime: reminderTime);
       if (context.mounted) _showMessage(context, '已开启生日和纪念日提醒');
     } else {
       ref.read(notificationsEnabledProvider.notifier).state = false;
@@ -486,7 +683,8 @@ class SettingsPage extends ConsumerWidget {
       final people = ref.read(peopleProvider).valueOrNull ?? [];
       final memories = ref.read(memoriesProvider).valueOrNull ?? [];
       final intervalDays = ref.read(contactIntervalDaysProvider);
-      await NotificationService().scheduleContactReminders(people, memories, intervalDays);
+      final reminderTime = ref.read(contactReminderTimeProvider);
+      await NotificationService().scheduleContactReminders(people, memories, intervalDays, reminderTime: reminderTime);
       if (context.mounted) _showMessage(context, '已开启定期联系提醒');
     } else {
       ref.read(contactRemindersEnabledProvider.notifier).state = false;
@@ -505,12 +703,164 @@ class SettingsPage extends ConsumerWidget {
       }
       ref.read(memoryReviewRemindersEnabledProvider.notifier).state = true;
       final memories = ref.read(memoriesProvider).valueOrNull ?? [];
-      await NotificationService().scheduleMemoryReviewReminders(memories);
+      final reminderTime = ref.read(memoryReviewReminderTimeProvider);
+      await NotificationService().scheduleMemoryReviewReminders(memories, reminderTime: reminderTime);
       if (context.mounted) _showMessage(context, '已开启回忆回顾提醒');
     } else {
       ref.read(memoryReviewRemindersEnabledProvider.notifier).state = false;
       if (context.mounted) _showMessage(context, '已关闭回忆回顾提醒');
     }
+  }
+
+  Future<void> _sendTestNotification(BuildContext context) async {
+    final granted = await NotificationService().requestPermissions();
+    if (!granted) {
+      if (context.mounted) _showMessage(context, '通知权限未授予，请先授予权限');
+      return;
+    }
+    await NotificationService().sendTestNotification();
+    if (context.mounted) _showMessage(context, '测试通知已发送');
+  }
+
+  Future<void> _updateContactReminders(WidgetRef ref) async {
+    if (ref.read(contactRemindersEnabledProvider)) {
+      final people = ref.read(peopleProvider).valueOrNull ?? [];
+      final memories = ref.read(memoriesProvider).valueOrNull ?? [];
+      final intervalDays = ref.read(contactIntervalDaysProvider);
+      final reminderTime = ref.read(contactReminderTimeProvider);
+      await NotificationService().scheduleContactReminders(people, memories, intervalDays, reminderTime: reminderTime);
+    }
+  }
+
+  Future<void> _pickTime(BuildContext context, WidgetRef ref, StateProvider<String> provider, String title) async {
+    final currentTime = ref.read(provider);
+    final parts = currentTime.split(':');
+    final initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              hourMinuteTextColor: Theme.of(context).colorScheme.onSurface,
+              dayPeriodTextColor: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final newTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+      ref.read(provider.notifier).state = newTime;
+
+      // 更新对应的提醒
+      if (provider == birthdayReminderTimeProvider && ref.read(notificationsEnabledProvider)) {
+        final people = ref.read(peopleProvider).valueOrNull ?? [];
+        await NotificationService().schedulePersonReminders(people, reminderTime: newTime);
+        if (context.mounted) _showMessage(context, '已更新生日和纪念日提醒时间');
+      } else if (provider == contactReminderTimeProvider && ref.read(contactRemindersEnabledProvider)) {
+        await _updateContactReminders(ref);
+        if (context.mounted) _showMessage(context, '已更新定期联系提醒时间');
+      } else if (provider == memoryReviewReminderTimeProvider && ref.read(memoryReviewRemindersEnabledProvider)) {
+        final memories = ref.read(memoriesProvider).valueOrNull ?? [];
+        await NotificationService().scheduleMemoryReviewReminders(memories, reminderTime: newTime);
+        if (context.mounted) _showMessage(context, '已更新回忆回顾提醒时间');
+      }
+    }
+  }
+
+  Future<void> _editCustomOptions(BuildContext context, WidgetRef ref, StateProvider<List<String>> provider, String title) async {
+    final colors = AppColors.fromStyle(ref.read(themeStyleProvider));
+    final currentOptions = List<String>.from(ref.read(provider));
+    final controller = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('编辑$title'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                          hintText: '输入新选项',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.add_circle, color: colors.primary),
+                      onPressed: () {
+                        final text = controller.text.trim();
+                        if (text.isNotEmpty && !currentOptions.contains(text)) {
+                          setState(() => currentOptions.add(text));
+                          controller.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: currentOptions.length,
+                    itemBuilder: (context, index) {
+                      final option = currentOptions[index];
+                      return ListTile(
+                        title: Text(option),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Color(0xFFE17055)),
+                          onPressed: () {
+                            if (currentOptions.length > 1) {
+                              setState(() => currentOptions.removeAt(index));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('至少保留一个选项')),
+                              );
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () {
+                ref.read(provider.notifier).state = currentOptions;
+                Navigator.pop(ctx);
+                _showMessage(context, '已更新$title');
+              },
+              child: const Text('保存'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

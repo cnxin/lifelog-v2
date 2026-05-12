@@ -17,13 +17,20 @@
 - ✅ 详情页展示喜好和禁忌标签
 - ✅ 数据库完整支持，兼容 React 版本数据格式
 
+#### 提醒时间自定义配置
+- ✅ **三种提醒时间独立配置**：生日/纪念日、定期联系、回忆回顾各自可设置提醒时间
+- ✅ **时间选择器**：点击提醒时间行打开系统时间选择器
+- ✅ **实时更新**：修改时间后立即重新调度通知
+- ✅ 默认时间：生日/纪念日 09:00、定期联系 10:00、回忆回顾 09:00
+
 #### 技术实现
-- 扩展 `NotificationService`，新增 `scheduleContactReminders` 和 `scheduleMemoryReviewReminders` 方法
-- 新增 3 个 providers：`contactRemindersEnabledProvider`、`memoryReviewRemindersEnabledProvider`、`contactIntervalDaysProvider`
-- 更新 `PeopleNotifier` 和 `MemoriesNotifier`，自动更新提醒
-- 设置页面新增两个提醒开关和配置说明
+- 扩展 `NotificationService`，新增 `scheduleContactReminders` 和 `scheduleMemoryReviewReminders` 方法，支持自定义时间参数
+- 新增 6 个 providers：`contactRemindersEnabledProvider`、`memoryReviewRemindersEnabledProvider`、`contactIntervalDaysProvider`、`birthdayReminderTimeProvider`、`contactReminderTimeProvider`、`memoryReviewReminderTimeProvider`
+- 更新 `PeopleNotifier` 和 `MemoriesNotifier`，自动更新提醒并传递自定义时间
+- 设置页面新增提醒开关、配置说明和时间选择器
 - `_GroupEditor` 组件支持喜好/禁忌档案编辑
 - `_PreferenceTags` 组件支持详情页展示
+- `_pickTime` 方法实现时间选择和通知更新逻辑
 
 #### 文档
 - ✅ 创建 `REMINDERS.md` 详细说明三种提醒功能

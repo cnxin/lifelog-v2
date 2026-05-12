@@ -26,7 +26,6 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
   String _placeId = '';
   final Set<String> _personIds = {};
   List<String> _photosPaths = [];
-  static const moods = ['日常', '开心', '轻松', '愉快', '感动', '难忘'];
   bool get isEditing => widget.memoryId != null;
 
   @override
@@ -56,7 +55,13 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
         Text('日期', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),
         GlassCard(colors: colors, onTap: _pickDate, child: Row(children: [Icon(Icons.calendar_today_rounded, size: 18, color: colors.primary), const SizedBox(width: 12), Text(_date, style: TextStyle(color: colors.textMain)), const Spacer(), Icon(Icons.chevron_right, color: colors.textSub)])), const SizedBox(height: 16),
         Text('心情', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),
-        Wrap(spacing: 8, runSpacing: 8, children: moods.map((m) => _Choice(label: m, selected: m == _mood, colors: colors, onTap: () => setState(() => _mood = m))).toList()), const SizedBox(height: 16),
+        Consumer(
+          builder: (context, ref, child) {
+            final moods = ref.watch(customMoodsProvider);
+            return Wrap(spacing: 8, runSpacing: 8, children: moods.map((m) => _Choice(label: m, selected: m == _mood, colors: colors, onTap: () => setState(() => _mood = m))).toList());
+          },
+        ),
+        const SizedBox(height: 16),
         Text('相关人物', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),
         Wrap(spacing: 8, runSpacing: 8, children: people.map((p) => _Choice(label: p.name, selected: _personIds.contains(p.id), colors: colors, onTap: () => setState(() { if (_personIds.contains(p.id)) { _personIds.remove(p.id); } else { _personIds.add(p.id); } }))).toList()), const SizedBox(height: 16),
         Text('地点', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)), const SizedBox(height: 8),

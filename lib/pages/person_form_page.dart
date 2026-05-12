@@ -30,7 +30,6 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
   final List<Anniversary> _anniversaries = [];
 
   bool get isEditing => widget.personId != null;
-  static const relationships = ['朋友', '家人', '同事', '同学', '恋人', '其他'];
 
   @override
   void initState() {
@@ -160,20 +159,23 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                       // 关系
                       _FieldLabel(label: '关系', colors: colors),
                       const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: relationships.map((r) {
-                          final selected = r == _relationship;
-                          return GestureDetector(
-                            onTap: () => setState(() => _relationship = r),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 160),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              decoration: BoxDecoration(
-                                gradient: selected ? colors.primaryGradient : null,
-                                color: selected ? null : colors.cardBg,
-                                borderRadius: BorderRadius.circular(999),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final relationships = ref.watch(customRelationshipsProvider);
+                          return Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: relationships.map((r) {
+                              final selected = r == _relationship;
+                              return GestureDetector(
+                                onTap: () => setState(() => _relationship = r),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 160),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    gradient: selected ? colors.primaryGradient : null,
+                                    color: selected ? null : colors.cardBg,
+                                    borderRadius: BorderRadius.circular(999),
                                 border: selected ? null : Border.all(color: colors.line),
                                 boxShadow: selected ? [colors.fabShadow] : [colors.shadow],
                               ),
@@ -188,6 +190,8 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                             ),
                           );
                         }).toList(),
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
 

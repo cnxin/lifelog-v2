@@ -143,8 +143,58 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
     );
   }
 
-  void _save() {
+  void _save() async {
     if (_name.text.trim().isEmpty) return;
+
+    // 检查重复地点
+    if (!isEditing) {
+      final existingPlaces = ref.read(placesProvider).valueOrNull ?? [];
+      final newName = _name.text.trim().toLowerCase();
+      final duplicates = existingPlaces.where((p) {
+        final existingName = p.name.toLowerCase();
+        // 简单的相似度检测：包含关系或编辑距离小
+        return existingName.contains(newName) ||
+               newName.contains(existingName) ||
+               _levenshteinDistance(existingName, newName) <= 2;
+      }).toList();
+
+      if (duplicates.isNotEmpty && mounted) {
+        final shouldContinue = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Text('可能重复'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('发现相似的地点：'),
+                const SizedBox(height: 8),
+                ...duplicates.map((p) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text('• ${p.name}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                )),
+                const SizedBox(height: 12),
+                const Text('确定要继续添加吗？'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('取消'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('继续添加'),
+              ),
+            ],
+          ),
+        );
+
+        if (shouldContinue != true) return;
+      }
+    }
+
     final tags = _tags.text.split(RegExp(r'[,，]')).map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
     final place = Place(
       id: widget.placeId ?? const Uuid().v4(),
@@ -166,7 +216,37 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
       favorite: _favorite,
     );
     ref.read(placesProvider.notifier).savePlace(place);
-    context.pop();
+    if (mounted) context.pop();
+  }
+
+  int _levenshteinDistance(String s1, String s2) {
+    if (s1 == s2) return 0;
+    if (s1.isEmpty) return s2.length;
+    if (s2.isEmpty) return s1.length;
+
+    final len1 = s1.length;
+    final len2 = s2.length;
+    final matrix = List.generate(len1 + 1, (_) => List.filled(len2 + 1, 0));
+
+    for (var i = 0; i <= len1; i++) {
+      matrix[i][0] = i;
+    }
+    for (var j = 0; j <= len2; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (var i = 1; i <= len1; i++) {
+      for (var j = 1; j <= len2; j++) {
+        final cost = s1[i - 1] == s2[j - 1] ? 0 : 1;
+        matrix[i][j] = [
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost,
+        ].reduce((a, b) => a < b ? a : b);
+      }
+    }
+
+    return matrix[len1][len2];
   }
 
   Future<void> _addPhotos() async {

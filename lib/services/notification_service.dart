@@ -42,16 +42,19 @@ class NotificationService {
     return granted;
   }
 
-  Future<void> schedulePersonReminders(List<person_model.Person> people) async {
+  Future<void> schedulePersonReminders(List<person_model.Person> people, {String reminderTime = '09:00'}) async {
     await _notifications.cancelAll();
     final now = DateTime.now();
+    final timeParts = reminderTime.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 9;
+    final minute = int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
 
     for (final person in people) {
       if ((person.birthday ?? '').isNotEmpty) {
-        await _scheduleBirthdayReminder(person, now);
+        await _scheduleBirthdayReminder(person, now, hour, minute);
       }
       for (final anniversary in person.anniversaries) {
-        await _scheduleAnniversaryReminder(person, anniversary, now);
+        await _scheduleAnniversaryReminder(person, anniversary, now, hour, minute);
       }
     }
   }
@@ -60,12 +63,17 @@ class NotificationService {
   /// [people] 人员列表
   /// [memories] 回忆列表，用于查找最近联系时间
   /// [contactIntervalDays] 联系间隔天数，默认30天
+  /// [reminderTime] 提醒时间，格式 "HH:mm"，默认 "10:00"
   Future<void> scheduleContactReminders(
     List<person_model.Person> people,
     List<MemoryEvent> memories,
-    int contactIntervalDays,
-  ) async {
+    int contactIntervalDays, {
+    String reminderTime = '10:00',
+  }) async {
     final now = DateTime.now();
+    final timeParts = reminderTime.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 10;
+    final minute = int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
 
     for (final person in people) {
       // 查找与该人员相关的最近一次回忆
@@ -83,7 +91,7 @@ class NotificationService {
 
       // 如果超过设定天数，安排提醒
       if (daysSinceLastContact >= contactIntervalDays) {
-        await _scheduleContactReminder(person, lastMemoryDate, daysSinceLastContact);
+        await _scheduleContactReminder(person, lastMemoryDate, daysSinceLastContact, hour, minute);
       }
     }
   }
@@ -92,10 +100,12 @@ class NotificationService {
     person_model.Person person,
     DateTime lastContactDate,
     int daysSinceLastContact,
+    int hour,
+    int minute,
   ) async {
-    // 每天上午10点提醒
+    // 指定时间提醒
     final scheduledDate = tz.TZDateTime.from(
-      DateTime.now().add(const Duration(days: 1)).copyWith(hour: 10, minute: 0, second: 0, millisecond: 0),
+      DateTime.now().add(const Duration(days: 1)).copyWith(hour: hour, minute: minute, second: 0, millisecond: 0),
       tz.local,
     );
 
@@ -123,9 +133,13 @@ class NotificationService {
 
   /// 调度回忆回顾提醒
   /// [memories] 回忆列表
-  Future<void> scheduleMemoryReviewReminders(List<MemoryEvent> memories) async {
+  /// [reminderTime] 提醒时间，格式 "HH:mm"，默认 "09:00"
+  Future<void> scheduleMemoryReviewReminders(List<MemoryEvent> memories, {String reminderTime = '09:00'}) async {
     final now = DateTime.now();
     final todayMD = '${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final timeParts = reminderTime.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 9;
+    final minute = int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
 
     // 查找往年今天的回忆
     final pastMemories = memories.where((m) {
@@ -139,9 +153,9 @@ class NotificationService {
 
     if (pastMemories.isEmpty) return;
 
-    // 每天上午9点提醒
+    // 指定时间提醒
     final scheduledDate = tz.TZDateTime.from(
-      DateTime.now().add(const Duration(days: 1)).copyWith(hour: 9, minute: 0, second: 0, millisecond: 0),
+      DateTime.now().add(const Duration(days: 1)).copyWith(hour: hour, minute: minute, second: 0, millisecond: 0),
       tz.local,
     );
 
@@ -170,7 +184,7 @@ class NotificationService {
     );
   }
 
-  Future<void> _scheduleBirthdayReminder(person_model.Person person, DateTime now) async {
+  Future<void> _scheduleBirthdayReminder(person_model.Person person, DateTime now, int hour, int minute) async {
     final birthday = _parseDate(person.birthday ?? '');
     if (birthday == null) return;
 
@@ -180,7 +194,7 @@ class NotificationService {
         : thisYear;
 
     final scheduledDate = tz.TZDateTime.from(
-      nextBirthday.subtract(const Duration(days: 1)).copyWith(hour: 9, minute: 0),
+      nextBirthday.subtract(const Duration(days: 1)).copyWith(hour: hour, minute: minute),
       tz.local,
     );
 
@@ -210,6 +224,8 @@ class NotificationService {
     person_model.Person person,
     person_model.Anniversary anniversary,
     DateTime now,
+    int hour,
+    int minute,
   ) async {
     final anniversaryDate = _parseDate(anniversary.date);
     if (anniversaryDate == null) return;
@@ -220,7 +236,7 @@ class NotificationService {
         : thisYear;
 
     final scheduledDate = tz.TZDateTime.from(
-      nextAnniversary.subtract(const Duration(days: 1)).copyWith(hour: 9, minute: 0),
+      nextAnniversary.subtract(const Duration(days: 1)).copyWith(hour: hour, minute: minute),
       tz.local,
     );
 
@@ -261,5 +277,24 @@ class NotificationService {
 
   Future<void> cancelAll() async {
     await _notifications.cancelAll();
+  }
+
+  /// 发送测试通知
+  Future<void> sendTestNotification() async {
+    await _notifications.show(
+      999999,
+      '测试通知',
+      'LifeLog 通知功能正常工作 ✅',
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'test_notifications',
+          '测试通知',
+          channelDescription: '用于测试通知功能',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+    );
   }
 }
