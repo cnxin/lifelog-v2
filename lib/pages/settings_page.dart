@@ -477,6 +477,95 @@ class SettingsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 28),
 
+              _SectionTitle(title: '关于', icon: Icons.info_rounded, colors: colors),
+              const SizedBox(height: 12),
+              GlassCard(
+                colors: colors,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: colors.primaryGradient,
+                        boxShadow: [colors.avatarShadow],
+                      ),
+                      child: const Icon(Icons.auto_stories_rounded, color: Colors.white, size: 40),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'LifeLog',
+                      style: TextStyle(
+                        fontFamily: 'Outfit',
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: colors.textMain,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'v1.1.0',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: colors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '记录生活中的美好瞬间',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colors.textSub,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Divider(height: 1, color: colors.line),
+                    const SizedBox(height: 16),
+                    _AboutRow(
+                      icon: Icons.palette_rounded,
+                      label: '设计',
+                      value: 'Material Design 3 + Glass UI',
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 12),
+                    _AboutRow(
+                      icon: Icons.code_rounded,
+                      label: '技术栈',
+                      value: 'Flutter 3.24 + Riverpod',
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 12),
+                    _AboutRow(
+                      icon: Icons.storage_rounded,
+                      label: '数据存储',
+                      value: 'Drift (SQLite)',
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 12),
+                    _AboutRow(
+                      icon: Icons.developer_mode_rounded,
+                      label: '开发者',
+                      value: 'cnxin',
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '© 2025 LifeLog. All rights reserved.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: colors.textSub,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
               // M3 组件展示
               _SectionTitle(title: '组件展示', icon: Icons.widgets_rounded, colors: colors),
               const SizedBox(height: 12),
@@ -977,6 +1066,47 @@ class _ColorSwatch extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AboutRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final AppColors colors;
+
+  const _AboutRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: colors.primary),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: colors.textSub,
+          ),
+        ),
+        const Spacer(),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: colors.textMain,
+          ),
+        ),
+      ],
     );
   }
 }
