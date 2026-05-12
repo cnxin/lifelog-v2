@@ -1,18 +1,15 @@
-import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 import 'dart:convert';
 import '../models/person.dart' as person_model;
 import '../models/lifelog_models.dart' as lifelog_model;
+import 'database_connection.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
 
 @DriftDatabase(tables: [People, Places, Memories])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(openConnection());
 
   @override
   int get schemaVersion => 1;
@@ -260,12 +257,4 @@ class AppDatabase extends _$AppDatabase {
       photos: (jsonDecode(row.photos) as List).map((e) => e.toString()).toList(),
     );
   }
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'lifelog.db'));
-    return NativeDatabase(file);
-  });
 }

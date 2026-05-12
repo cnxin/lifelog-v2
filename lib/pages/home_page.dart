@@ -17,7 +17,8 @@ class HomePage extends ConsumerWidget {
     final placesAsync = ref.watch(placesProvider);
     final memoriesAsync = ref.watch(memoriesProvider);
     final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style);
+    final isDark = ref.watch(themeModeProvider);
+    final colors = AppColors.fromStyle(style, isDark: isDark);
 
     final people = peopleAsync.valueOrNull;
     final places = placesAsync.valueOrNull;

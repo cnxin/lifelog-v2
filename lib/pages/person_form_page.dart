@@ -69,7 +69,7 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
   Widget build(BuildContext context) {
     final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(style);
+    final colors = AppColors.fromStyle(style, isDark: isDark);
 
     return GradientBackground(
       colors: colors,

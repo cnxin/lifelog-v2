@@ -27,7 +27,7 @@ class _PlacesListPageState extends ConsumerState<PlacesListPage> {
   Widget build(BuildContext context) {
     final placesAsync = ref.watch(placesProvider);
     final query = ref.watch(placeSearchQueryProvider);
-    final colors = AppColors.fromStyle(ref.watch(themeStyleProvider));
+    final colors = AppColors.fromStyle(ref.watch(themeStyleProvider), isDark: ref.watch(themeModeProvider));
     final theme = Theme.of(context);
 
     return Stack(

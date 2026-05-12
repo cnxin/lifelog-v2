@@ -14,7 +14,7 @@ class PersonDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final peopleAsync = ref.watch(peopleProvider);
     final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style);
+    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
 
     return peopleAsync.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),

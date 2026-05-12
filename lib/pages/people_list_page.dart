@@ -28,7 +28,7 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
     final peopleAsync = ref.watch(peopleProvider);
     final searchQuery = ref.watch(searchQueryProvider);
     final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style);
+    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
     final theme = Theme.of(context);
 
     return Stack(

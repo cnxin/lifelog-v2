@@ -142,13 +142,34 @@ class AppColors {
     gradientColors: [Color(0xFF9CA3AF), Color(0xFF7B8796)],
   );
 
-  static AppColors fromStyle(AppThemeStyle style) {
-    switch (style) {
-      case AppThemeStyle.classic: return classic;
-      case AppThemeStyle.cream: return cream;
-      case AppThemeStyle.mint: return mint;
-      case AppThemeStyle.mist: return mist;
-    }
+  static AppColors fromStyle(AppThemeStyle style, {bool isDark = false}) {
+    final base = switch (style) {
+      AppThemeStyle.classic => classic,
+      AppThemeStyle.cream => cream,
+      AppThemeStyle.mint => mint,
+      AppThemeStyle.mist => mist,
+    };
+
+    if (!isDark) return base;
+
+    return AppColors(
+      primary: base.primaryLight,
+      primaryLight: const Color(0xFFC7D0FF),
+      secondary: base.secondary,
+      bgColor: const Color(0xFF12131D),
+      cardBg: const Color(0xE62A2C3D),
+      cardSolid: const Color(0xFF2A2C3D),
+      textMain: const Color(0xFFF4F6FF),
+      textSub: const Color(0xFFB6BCD4),
+      line: const Color(0x26FFFFFF),
+      softPurple: base.primary.withAlpha(54),
+      softOrange: base.secondary.withAlpha(48),
+      shadow: const BoxShadow(color: Color(0x52000000), blurRadius: 26, offset: Offset(0, 12)),
+      pressShadow: const BoxShadow(color: Color(0x66000000), blurRadius: 14, offset: Offset(0, 5)),
+      avatarShadow: BoxShadow(color: base.primary.withAlpha(92), blurRadius: 28, offset: const Offset(0, 12)),
+      fabShadow: BoxShadow(color: base.primary.withAlpha(82), blurRadius: 24, offset: const Offset(0, 12)),
+      gradientColors: const [Color(0xFF171827), Color(0xFF10111A)],
+    );
   }
 }
 

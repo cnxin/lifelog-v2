@@ -13,7 +13,7 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStyle = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(currentStyle);
+    final colors = AppColors.fromStyle(currentStyle, isDark: isDark);
     final theme = Theme.of(context);
 
     return CustomScrollView(

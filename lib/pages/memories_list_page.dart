@@ -26,7 +26,7 @@ class _MemoriesListPageState extends ConsumerState<MemoriesListPage> {
     final people = ref.watch(peopleProvider).valueOrNull ?? [];
     final places = ref.watch(placesProvider).valueOrNull ?? [];
     final query = ref.watch(memorySearchQueryProvider);
-    final colors = AppColors.fromStyle(ref.watch(themeStyleProvider));
+    final colors = AppColors.fromStyle(ref.watch(themeStyleProvider), isDark: ref.watch(themeModeProvider));
     final theme = Theme.of(context);
 
     return Stack(children: [

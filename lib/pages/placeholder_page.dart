@@ -19,7 +19,7 @@ class PlaceholderPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style);
+    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
     final theme = Theme.of(context);
 
     return CustomScrollView(

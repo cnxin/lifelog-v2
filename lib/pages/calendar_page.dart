@@ -22,7 +22,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final peopleAsync = ref.watch(peopleProvider);
     final memoriesAsync = ref.watch(memoriesProvider);
     final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style);
+    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
     final people = peopleAsync.valueOrNull;
     final memories = memoriesAsync.valueOrNull;
 
