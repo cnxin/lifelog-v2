@@ -11,6 +11,9 @@ final notificationServiceProvider = Provider<NotificationService>((ref) => Notif
 final themeStyleProvider = StateProvider<AppThemeStyle>((ref) => AppThemeStyle.classic);
 final themeModeProvider = StateProvider<bool>((ref) => false);
 final notificationsEnabledProvider = StateProvider<bool>((ref) => false);
+final contactRemindersEnabledProvider = StateProvider<bool>((ref) => false);
+final memoryReviewRemindersEnabledProvider = StateProvider<bool>((ref) => false);
+final contactIntervalDaysProvider = StateProvider<int>((ref) => 30);
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 final placeSearchQueryProvider = StateProvider<String>((ref) => '');
@@ -54,6 +57,12 @@ class PeopleNotifier extends AsyncNotifier<List<Person>> {
     if (ref.read(notificationsEnabledProvider)) {
       final people = state.valueOrNull ?? [];
       await ref.read(notificationServiceProvider).schedulePersonReminders(people);
+    }
+    if (ref.read(contactRemindersEnabledProvider)) {
+      final people = state.valueOrNull ?? [];
+      final memories = ref.read(memoriesProvider).valueOrNull ?? [];
+      final intervalDays = ref.read(contactIntervalDaysProvider);
+      await ref.read(notificationServiceProvider).scheduleContactReminders(people, memories, intervalDays);
     }
   }
 
@@ -114,14 +123,30 @@ class MemoriesNotifier extends AsyncNotifier<List<MemoryEvent>> {
   Future<void> saveMemory(MemoryEvent memory) async {
     await _db.saveMemory(memory);
     state = AsyncData(await _db.getAllMemories());
+    await _updateNotifications();
   }
 
   Future<void> deleteMemory(String id) async {
     await _db.deleteMemory(id);
     state = AsyncData(await _db.getAllMemories());
+    await _updateNotifications();
   }
 
   Future<void> search(String query) async {
     state = AsyncData(query.isEmpty ? await _db.getAllMemories() : await _db.searchMemories(query));
+  }
+
+  Future<void> _updateNotifications() async {
+    final memories = state.valueOrNull ?? [];
+
+    if (ref.read(contactRemindersEnabledProvider)) {
+      final people = ref.read(peopleProvider).valueOrNull ?? [];
+      final intervalDays = ref.read(contactIntervalDaysProvider);
+      await ref.read(notificationServiceProvider).scheduleContactReminders(people, memories, intervalDays);
+    }
+
+    if (ref.read(memoryReviewRemindersEnabledProvider)) {
+      await ref.read(notificationServiceProvider).scheduleMemoryReviewReminders(memories);
+    }
   }
 }

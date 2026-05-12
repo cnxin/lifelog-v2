@@ -160,6 +160,89 @@ class SettingsPage extends ConsumerWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
+
+              // 定期联系提醒
+              GlassCard(
+                colors: colors,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                onTap: () => _toggleContactReminders(context, ref),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: colors.softPurple,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.people_rounded,
+                        size: 20,
+                        color: colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('定期联系提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                          Text(
+                            '超过 ${ref.watch(contactIntervalDaysProvider)} 天未联系时提醒',
+                            style: TextStyle(fontSize: 12, color: colors.textSub),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: ref.watch(contactRemindersEnabledProvider),
+                      onChanged: (v) => _toggleContactReminders(context, ref),
+                      activeColor: colors.primary,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 回忆回顾提醒
+              GlassCard(
+                colors: colors,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                onTap: () => _toggleMemoryReviewReminders(context, ref),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: colors.softPurple,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        size: 20,
+                        color: colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('回忆回顾提醒', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: colors.textMain)),
+                          Text('回顾往年今天的美好时光', style: TextStyle(fontSize: 12, color: colors.textSub)),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: ref.watch(memoryReviewRemindersEnabledProvider),
+                      onChanged: (v) => _toggleMemoryReviewReminders(context, ref),
+                      activeColor: colors.primary,
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 28),
 
               _SectionTitle(title: '数据管理', icon: Icons.storage_rounded, colors: colors),
@@ -387,6 +470,46 @@ class SettingsPage extends ConsumerWidget {
       ref.read(notificationsEnabledProvider.notifier).state = false;
       await NotificationService().cancelAll();
       if (context.mounted) _showMessage(context, '已关闭提醒');
+    }
+  }
+
+  Future<void> _toggleContactReminders(BuildContext context, WidgetRef ref) async {
+    final current = ref.read(contactRemindersEnabledProvider);
+
+    if (!current) {
+      final granted = await NotificationService().requestPermissions();
+      if (!granted) {
+        if (context.mounted) _showMessage(context, '通知权限未授予');
+        return;
+      }
+      ref.read(contactRemindersEnabledProvider.notifier).state = true;
+      final people = ref.read(peopleProvider).valueOrNull ?? [];
+      final memories = ref.read(memoriesProvider).valueOrNull ?? [];
+      final intervalDays = ref.read(contactIntervalDaysProvider);
+      await NotificationService().scheduleContactReminders(people, memories, intervalDays);
+      if (context.mounted) _showMessage(context, '已开启定期联系提醒');
+    } else {
+      ref.read(contactRemindersEnabledProvider.notifier).state = false;
+      if (context.mounted) _showMessage(context, '已关闭定期联系提醒');
+    }
+  }
+
+  Future<void> _toggleMemoryReviewReminders(BuildContext context, WidgetRef ref) async {
+    final current = ref.read(memoryReviewRemindersEnabledProvider);
+
+    if (!current) {
+      final granted = await NotificationService().requestPermissions();
+      if (!granted) {
+        if (context.mounted) _showMessage(context, '通知权限未授予');
+        return;
+      }
+      ref.read(memoryReviewRemindersEnabledProvider.notifier).state = true;
+      final memories = ref.read(memoriesProvider).valueOrNull ?? [];
+      await NotificationService().scheduleMemoryReviewReminders(memories);
+      if (context.mounted) _showMessage(context, '已开启回忆回顾提醒');
+    } else {
+      ref.read(memoryReviewRemindersEnabledProvider.notifier).state = false;
+      if (context.mounted) _showMessage(context, '已关闭回忆回顾提醒');
     }
   }
 }

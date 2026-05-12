@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026-05-12
+
+### 新增功能
+
+#### 智能提醒系统扩展
+- ✅ **定期联系提醒**：根据最近一次回忆判断是否需要联系某人，超过设定天数（默认30天）则发送提醒
+- ✅ **回忆回顾提醒**：展示往年今天的回忆，让用户回顾过去的美好时光
+- ✅ 三种提醒独立开关，互不干扰
+- ✅ 完整的通知渠道配置
+
+#### 技术实现
+- 扩展 `NotificationService`，新增 `scheduleContactReminders` 和 `scheduleMemoryReviewReminders` 方法
+- 新增 3 个 providers：`contactRemindersEnabledProvider`、`memoryReviewRemindersEnabledProvider`、`contactIntervalDaysProvider`
+- 更新 `PeopleNotifier` 和 `MemoriesNotifier`，自动更新提醒
+- 设置页面新增两个提醒开关和配置说明
+
+#### 文档
+- ✅ 创建 `REMINDERS.md` 详细说明三种提醒功能
+- ✅ 包含使用场景、技术实现、故障排查
+
+### 构建
+- ✅ APK 构建成功（v1.1.0）
+- 文件大小：9.4MB (armeabi-v7a) / 9.8MB (arm64-v8a) / 9.9MB (x86_64)
+
+---
+
 ## 2026-05-11
 
 ### 完成的工作
