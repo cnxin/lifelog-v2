@@ -232,6 +232,8 @@ flutter build web --release
 - [DEVELOPMENT.md](DEVELOPMENT.md) - 开发环境配置指南
 - [DEPLOYMENT.md](DEPLOYMENT.md) - 部署指南（Web/Android/iOS）
 - [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
+- [REMINDERS.md](REMINDERS.md) - 智能提醒功能说明（生日/纪念日/定期联系/回忆回顾）
+- [PREFERENCES.md](PREFERENCES.md) - 人员喜好与禁忌档案功能说明
 - [MIGRATION_STATUS.md](MIGRATION_STATUS.md) - 从 React 迁移的进度
 - [SQLITE_MIGRATION.md](SQLITE_MIGRATION.md) - 数据库迁移说明
 - [ICON_SPLASH_SETUP.md](ICON_SPLASH_SETUP.md) - 应用图标和启动页配置

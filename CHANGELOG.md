@@ -10,15 +10,39 @@
 - ✅ 三种提醒独立开关，互不干扰
 - ✅ 完整的通知渠道配置
 
+#### 人员喜好与禁忌档案
+- ✅ **喜好档案**：支持自由分组的喜好记录（如颜色、食物、电影类型）
+- ✅ **禁忌档案**：支持自由分组的禁忌记录（如过敏、禁忌话题）
+- ✅ 完整的编辑界面（添加分类、添加项目、删除）
+- ✅ 详情页展示喜好和禁忌标签
+- ✅ 数据库完整支持，兼容 React 版本数据格式
+
 #### 技术实现
 - 扩展 `NotificationService`，新增 `scheduleContactReminders` 和 `scheduleMemoryReviewReminders` 方法
 - 新增 3 个 providers：`contactRemindersEnabledProvider`、`memoryReviewRemindersEnabledProvider`、`contactIntervalDaysProvider`
 - 更新 `PeopleNotifier` 和 `MemoriesNotifier`，自动更新提醒
 - 设置页面新增两个提醒开关和配置说明
+- `_GroupEditor` 组件支持喜好/禁忌档案编辑
+- `_PreferenceTags` 组件支持详情页展示
 
 #### 文档
 - ✅ 创建 `REMINDERS.md` 详细说明三种提醒功能
-- ✅ 包含使用场景、技术实现、故障排查
+- ✅ 创建 `PREFERENCES.md` 详细说明喜好与禁忌档案功能
+- ✅ 包含使用场景、技术实现、数据格式、UI 设计
+
+### 功能对比
+
+**已补齐 React 版本核心功能**：
+- ✅ 定期联系提醒
+- ✅ 回忆回顾提醒
+- ✅ 人员喜好档案
+- ✅ 人员禁忌档案
+
+**Flutter 版本独有优势**：
+- ✅ 暗色模式
+- ✅ Material Design 3
+- ✅ 全局搜索
+- ✅ SQLite 性能提升 10-100 倍
 
 ### 构建
 - ✅ APK 构建成功（v1.1.0）
