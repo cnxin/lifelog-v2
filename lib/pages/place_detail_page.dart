@@ -71,6 +71,16 @@ class PlaceDetailPage extends ConsumerWidget {
                       ]),
                       const SizedBox(height: 18),
                       _InfoCard(title: '位置', icon: Icons.location_on_rounded, colors: colors, child: Text([place.province, place.city, place.area, place.mall, place.storeName].where((s) => s.isNotEmpty).join(' · '), style: TextStyle(color: colors.textMain, height: 1.5))),
+                      if (place.latitude != null && place.longitude != null)
+                        _InfoCard(
+                          title: '坐标',
+                          icon: Icons.my_location_rounded,
+                          colors: colors,
+                          child: Text(
+                            '${place.latitude!.toStringAsFixed(6)}, ${place.longitude!.toStringAsFixed(6)}',
+                            style: TextStyle(color: colors.textMain, height: 1.5),
+                          ),
+                        ),
                       if (place.address.isNotEmpty) _InfoCard(title: '地址', icon: Icons.map_rounded, colors: colors, child: Text(place.address, style: TextStyle(color: colors.textMain, height: 1.5))),
                       if (place.mapUrl.isNotEmpty || place.sourceUrl.isNotEmpty || place.platformLinks.isNotEmpty)
                         _InfoCard(

@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/photo_viewer.dart';
 import '../services/photo_service.dart';
+import '../services/location_service.dart';
 
 class PlaceFormPage extends ConsumerStatefulWidget {
   final String? placeId;
@@ -30,6 +31,8 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
   final _platformLinks = TextEditingController();
   final _desc = TextEditingController();
   final _tags = TextEditingController();
+  final _latitude = TextEditingController();
+  final _longitude = TextEditingController();
   String _category = '餐厅';
   double _rating = 4.5;
   bool _favorite = false;
@@ -58,6 +61,8 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
     _platformLinks.text = place.platformLinks.map((link) => '${link.label}|${link.url}|${link.platform}').join('\n');
     _desc.text = place.desc;
     _tags.text = place.tags.join('，');
+    if (place.latitude != null) _latitude.text = place.latitude.toString();
+    if (place.longitude != null) _longitude.text = place.longitude.toString();
     setState(() {
       _category = place.category.isEmpty ? '餐厅' : place.category;
       _rating = place.rating == 0 ? 4.5 : place.rating;
@@ -79,6 +84,8 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
     _platformLinks.dispose();
     _desc.dispose();
     _tags.dispose();
+    _latitude.dispose();
+    _longitude.dispose();
     super.dispose();
   }
 
@@ -118,8 +125,40 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
                 const SizedBox(height: 16),
                 Text('评分 ${_rating.toStringAsFixed(1)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
                 Slider(value: _rating, min: 0, max: 5, divisions: 10, activeColor: colors.primary, onChanged: (v) => setState(() => _rating = v)),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 _Input(label: '地址', controller: _address, icon: Icons.route_rounded, colors: colors),
+                const SizedBox(height: 16),
+                Text('定位坐标（可选）', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(child: _Input(label: '纬度', controller: _latitude, icon: Icons.location_on_rounded, colors: colors)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _Input(label: '经度', controller: _longitude, icon: Icons.location_on_rounded, colors: colors)),
+                  ],
+                ),
+                if (_latitude.text.isNotEmpty && _longitude.text.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: GestureDetector(
+                      onTap: _generateMapUrl,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          gradient: colors.primaryGradient,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.map_rounded, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text('生成地图链接', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 16),
                 _Input(label: '地图链接', controller: _mapUrl, icon: Icons.map_rounded, colors: colors),
                 const SizedBox(height: 16),
@@ -197,6 +236,16 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
     }
 
     final tags = _tags.text.split(RegExp(r'[,，]')).map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+
+    double? lat;
+    double? lng;
+    if (_latitude.text.trim().isNotEmpty) {
+      lat = double.tryParse(_latitude.text.trim());
+    }
+    if (_longitude.text.trim().isNotEmpty) {
+      lng = double.tryParse(_longitude.text.trim());
+    }
+
     final place = Place(
       id: widget.placeId ?? const Uuid().v4(),
       name: _name.text.trim(),
@@ -215,9 +264,31 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
       tags: tags,
       photos: _photosPaths,
       favorite: _favorite,
+      latitude: lat,
+      longitude: lng,
     );
     ref.read(placesProvider.notifier).savePlace(place);
     if (mounted) context.pop();
+  }
+
+  void _generateMapUrl() {
+    final lat = double.tryParse(_latitude.text.trim());
+    final lng = double.tryParse(_longitude.text.trim());
+
+    if (lat != null && lng != null) {
+      final locationService = LocationService();
+      if (locationService.isValidLatitude(lat) && locationService.isValidLongitude(lng)) {
+        final url = locationService.generateMapUrl(lat, lng, _name.text.trim());
+        _mapUrl.text = url;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('地图链接已自动填入')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('经纬度格式不正确')),
+        );
+      }
+    }
   }
 
   int _levenshteinDistance(String s1, String s2) {
