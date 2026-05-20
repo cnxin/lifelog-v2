@@ -8,7 +8,7 @@ class DatabaseHelper {
   factory DatabaseHelper() => _instance;
   DatabaseHelper._internal();
 
-  static const appVersion = '0.2.0';
+  static const appVersion = '0.3.1';
   static const _stateKey = 'lifelog_web_state';
   static const _settingsKey = 'lifelog_settings';
   static const _reminderSettingsKey = 'lifelog_reminder_settings';

@@ -84,7 +84,7 @@ build/app/outputs/flutter-apk/app-release.apk
 本仓库也会把发布包归档到 `releases/`，文件名格式示例：
 
 ```text
-releases/lifelog-v0.3.0+44.apk
+releases/lifelog-v0.3.1+45.apk
 ```
 
 ## 项目结构
@@ -163,6 +163,14 @@ flutter test
 - 导出备份为 JSON，包含人物、地点、回忆、设置、提醒配置和地点合并历史。
 - 本项目不要求登录账号，也不默认上传数据。
 
+## 应用标识
+
+- Android 包名：`com.cnxin.lifelog.v2`
+- iOS Bundle ID：`com.cnxin.lifelog.v2`
+- 显示名称：`LifeLog v2`
+
+v2 使用独立应用标识，可与原版 LifeLog 同时安装。
+
 ## 文档
 
 - [DEVELOPMENT.md](DEVELOPMENT.md) - 开发环境配置
@@ -178,7 +186,7 @@ flutter test
 `pubspec.yaml`:
 
 ```yaml
-version: 0.3.0+44
+version: 0.3.1+45
 ```
 
 ## License

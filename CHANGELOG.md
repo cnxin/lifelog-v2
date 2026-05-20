@@ -1,5 +1,15 @@
 # 开发日志
 
+## 2026-05-20 修复
+
+### 兼容性修复
+- ✅ 将 v2 Android `applicationId` 和 `namespace` 改为 `com.cnxin.lifelog.v2`，避免与原版 LifeLog 安装冲突。
+- ✅ Android 显示名称改为 `LifeLog v2`，便于和原版区分。
+- ✅ iOS Bundle ID 同步改为 `com.cnxin.lifelog.v2`。
+- ✅ 版本更新为 `0.3.1+45`，用于替代会与原版冲突的 `0.3.0+44` APK。
+
+---
+
 ## 2026-05-20
 
 ### 新增功能

@@ -176,7 +176,7 @@ class AccountPage extends ConsumerWidget {
                                 fontWeight: FontWeight.w800,
                                 color: colors.textMain)),
                         const SizedBox(height: 4),
-                        Text('0.3.0 · Flutter 双端版',
+                        Text('0.3.1 · Flutter 双端版',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
