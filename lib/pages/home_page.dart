@@ -6,6 +6,7 @@ import '../providers/providers.dart';
 import '../models/person.dart';
 import '../models/lifelog_models.dart';
 import '../theme/app_theme.dart';
+import '../utils/relationship_insights.dart';
 import '../widgets/glass_card.dart';
 
 class HomePage extends ConsumerWidget {
@@ -19,19 +20,32 @@ class HomePage extends ConsumerWidget {
     final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
     final colors = AppColors.fromStyle(style, isDark: isDark);
+    final contactIntervalDays = ref.watch(contactIntervalDaysProvider);
 
     final people = peopleAsync.valueOrNull;
     final places = placesAsync.valueOrNull;
     final memories = memoriesAsync.valueOrNull;
 
     if (people == null || places == null || memories == null) {
-      if (peopleAsync.hasError) return Center(child: Text('${peopleAsync.error}'));
-      if (placesAsync.hasError) return Center(child: Text('${placesAsync.error}'));
-      if (memoriesAsync.hasError) return Center(child: Text('${memoriesAsync.error}'));
+      if (peopleAsync.hasError) {
+        return Center(child: Text('${peopleAsync.error}'));
+      }
+      if (placesAsync.hasError) {
+        return Center(child: Text('${placesAsync.error}'));
+      }
+      if (memoriesAsync.hasError) {
+        return Center(child: Text('${memoriesAsync.error}'));
+      }
       return const Center(child: CircularProgressIndicator());
     }
 
-    return _DashboardView(people: people, places: places, memories: memories, colors: colors);
+    return _DashboardView(
+      people: people,
+      places: places,
+      memories: memories,
+      colors: colors,
+      contactIntervalDays: contactIntervalDays,
+    );
   }
 }
 
@@ -40,12 +54,14 @@ class _DashboardView extends StatelessWidget {
   final List<Place> places;
   final List<MemoryEvent> memories;
   final AppColors colors;
+  final int contactIntervalDays;
 
   const _DashboardView({
     required this.people,
     required this.places,
     required this.memories,
     required this.colors,
+    required this.contactIntervalDays,
   });
 
   @override
@@ -55,6 +71,17 @@ class _DashboardView extends StatelessWidget {
     final favoritePeople = people.where((p) => p.favorite).toList();
     final favoritePlaces = places.where((p) => p.favorite).toList();
     final recentMemories = memories.take(3).toList();
+    final relationshipInsights = buildRelationshipInsights(
+      people: people,
+      memories: memories,
+      places: places,
+      now: now,
+      contactIntervalDays: contactIntervalDays,
+    );
+    final attentionInsights = relationshipInsights
+        .where((insight) => insight.needsDashboardAttention)
+        .take(4)
+        .toList();
     final theme = Theme.of(context);
 
     return CustomScrollView(
@@ -72,11 +99,14 @@ class _DashboardView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          DateFormat('yyyy年M月d日 EEEE', 'zh_CN').format(now).toUpperCase(),
+                          DateFormat('yyyy年M月d日 EEEE', 'zh_CN')
+                              .format(now)
+                              .toUpperCase(),
                           style: theme.textTheme.labelMedium,
                         ),
                         const SizedBox(height: 6),
-                        Text(_getGreeting(now), style: theme.textTheme.headlineLarge),
+                        Text(_getGreeting(now),
+                            style: theme.textTheme.headlineLarge),
                         const SizedBox(height: 4),
                         Text(
                           '记录 ${people.length} 位重要的人、${places.length} 个地点、${memories.length} 段回忆',
@@ -101,7 +131,8 @@ class _DashboardView extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                  child: _SectionHeader(title: '近期生日', icon: Icons.cake, colors: colors),
+                  child: _SectionHeader(
+                      title: '近期生日', icon: Icons.cake, colors: colors),
                 ),
                 SizedBox(
                   height: 120,
@@ -123,7 +154,8 @@ class _DashboardView extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-            child: _SectionHeader(title: '概览', icon: Icons.dashboard_rounded, colors: colors),
+            child: _SectionHeader(
+                title: '概览', icon: Icons.dashboard_rounded, colors: colors),
           ),
         ),
         SliverToBoxAdapter(
@@ -136,18 +168,31 @@ class _DashboardView extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      _MetricTile(value: '${people.length}', label: '人物', bgColor: colors.softPurple, colors: colors),
+                      _MetricTile(
+                          value: '${people.length}',
+                          label: '人物',
+                          bgColor: colors.softPurple,
+                          colors: colors),
                       const SizedBox(width: 10),
-                      _MetricTile(value: '${places.length}', label: '地点', bgColor: colors.softOrange, colors: colors),
+                      _MetricTile(
+                          value: '${places.length}',
+                          label: '地点',
+                          bgColor: colors.softOrange,
+                          colors: colors),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      _MetricTile(value: '${memories.length}', label: '记忆', bgColor: colors.softPurple, colors: colors),
+                      _MetricTile(
+                          value: '${memories.length}',
+                          label: '记忆',
+                          bgColor: colors.softPurple,
+                          colors: colors),
                       const SizedBox(width: 10),
                       _MetricTile(
-                        value: '${favoritePeople.length + favoritePlaces.length}',
+                        value:
+                            '${favoritePeople.length + favoritePlaces.length}',
                         label: '收藏',
                         bgColor: colors.softOrange,
                         colors: colors,
@@ -171,11 +216,34 @@ class _DashboardView extends StatelessWidget {
             ),
           ),
         ),
+        if (attentionInsights.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
+              child: _SectionHeader(
+                  title: '关系维护',
+                  icon: Icons.people_alt_rounded,
+                  colors: colors),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList.separated(
+              itemCount: attentionInsights.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (_, i) => _RelationshipAttentionCard(
+                insight: attentionInsights[i],
+                colors: colors,
+              ),
+            ),
+          ),
+        ],
         if (favoritePeople.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
-              child: _SectionHeader(title: '收藏人物', icon: Icons.star_rounded, colors: colors),
+              child: _SectionHeader(
+                  title: '收藏人物', icon: Icons.star_rounded, colors: colors),
             ),
           ),
           SliverToBoxAdapter(
@@ -186,7 +254,8 @@ class _DashboardView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 itemCount: favoritePeople.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 16),
-                itemBuilder: (_, i) => _FavoriteItem(person: favoritePeople[i], colors: colors, colorVariant: i),
+                itemBuilder: (_, i) => _FavoriteItem(
+                    person: favoritePeople[i], colors: colors, colorVariant: i),
               ),
             ),
           ),
@@ -195,7 +264,8 @@ class _DashboardView extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
-              child: _SectionHeader(title: '收藏地点', icon: Icons.place_rounded, colors: colors),
+              child: _SectionHeader(
+                  title: '收藏地点', icon: Icons.place_rounded, colors: colors),
             ),
           ),
           SliverToBoxAdapter(
@@ -206,7 +276,8 @@ class _DashboardView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 itemCount: favoritePlaces.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 14),
-                itemBuilder: (_, i) => _FavoritePlaceCard(place: favoritePlaces[i], colors: colors, colorVariant: i),
+                itemBuilder: (_, i) => _FavoritePlaceCard(
+                    place: favoritePlaces[i], colors: colors, colorVariant: i),
               ),
             ),
           ),
@@ -215,7 +286,10 @@ class _DashboardView extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 28, 24, 12),
-              child: _SectionHeader(title: '最近回忆', icon: Icons.auto_stories_rounded, colors: colors),
+              child: _SectionHeader(
+                  title: '最近回忆',
+                  icon: Icons.auto_stories_rounded,
+                  colors: colors),
             ),
           ),
           SliverPadding(
@@ -245,7 +319,8 @@ class _DashboardView extends StatelessWidget {
     return '晚上好';
   }
 
-  List<_UpcomingBirthday> _getUpcomingBirthdays(List<Person> people, DateTime now) {
+  List<_UpcomingBirthday> _getUpcomingBirthdays(
+      List<Person> people, DateTime now) {
     final results = <_UpcomingBirthday>[];
     for (final person in people) {
       if (person.birthday == null) continue;
@@ -253,8 +328,11 @@ class _DashboardView extends StatelessWidget {
         final bd = DateTime.parse(person.birthday!);
         var next = DateTime(now.year, bd.month, bd.day);
         if (next.isBefore(now)) next = DateTime(now.year + 1, bd.month, bd.day);
-        final days = next.difference(DateTime(now.year, now.month, now.day)).inDays;
-        if (days <= 60) results.add(_UpcomingBirthday(person: person, daysUntil: days));
+        final days =
+            next.difference(DateTime(now.year, now.month, now.day)).inDays;
+        if (days <= 60) {
+          results.add(_UpcomingBirthday(person: person, daysUntil: days));
+        }
       } catch (_) {}
     }
     results.sort((a, b) => a.daysUntil.compareTo(b.daysUntil));
@@ -273,7 +351,8 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final AppColors colors;
 
-  const _SectionHeader({required this.title, required this.icon, required this.colors});
+  const _SectionHeader(
+      {required this.title, required this.icon, required this.colors});
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +379,8 @@ class _AnniversaryCard extends StatelessWidget {
   final AppColors colors;
   final bool isSecondary;
 
-  const _AnniversaryCard({required this.entry, required this.colors, this.isSecondary = false});
+  const _AnniversaryCard(
+      {required this.entry, required this.colors, this.isSecondary = false});
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +389,9 @@ class _AnniversaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        gradient: isSecondary ? colors.secondaryGradient : colors.primaryToLightGradient,
+        gradient: isSecondary
+            ? colors.secondaryGradient
+            : colors.primaryToLightGradient,
         boxShadow: [colors.shadow],
       ),
       child: Column(
@@ -318,7 +400,8 @@ class _AnniversaryCard extends StatelessWidget {
         children: [
           Text(
             '${entry.person.name} 的生日',
-            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -337,11 +420,13 @@ class _AnniversaryCard extends StatelessWidget {
               ),
               if (entry.daysUntil > 0) ...[
                 const SizedBox(width: 4),
-                const Text('天后', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                const Text('天后',
+                    style: TextStyle(color: Colors.white70, fontSize: 13)),
               ],
             ],
           ),
-          Text(entry.person.birthday ?? '', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          Text(entry.person.birthday ?? '',
+              style: const TextStyle(color: Colors.white70, fontSize: 12)),
         ],
       ),
     );
@@ -354,7 +439,11 @@ class _MetricTile extends StatelessWidget {
   final Color bgColor;
   final AppColors colors;
 
-  const _MetricTile({required this.value, required this.label, required this.bgColor, required this.colors});
+  const _MetricTile(
+      {required this.value,
+      required this.label,
+      required this.bgColor,
+      required this.colors});
 
   @override
   Widget build(BuildContext context) {
@@ -362,7 +451,8 @@ class _MetricTile extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: 76),
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+            color: bgColor, borderRadius: BorderRadius.circular(16)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -398,7 +488,12 @@ class _QuickMemoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
           gradient: colors.primaryGradient,
-          boxShadow: [BoxShadow(color: colors.primary.withAlpha(41), blurRadius: 26, offset: const Offset(0, 14))],
+          boxShadow: [
+            BoxShadow(
+                color: colors.primary.withAlpha(41),
+                blurRadius: 26,
+                offset: const Offset(0, 14))
+          ],
         ),
         child: const Row(
           children: [
@@ -408,9 +503,14 @@ class _QuickMemoryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('快速记录', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+                  Text('快速记录',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600)),
                   SizedBox(height: 4),
-                  Text('记录一个新的回忆...', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text('记录一个新的回忆...',
+                      style: TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -430,7 +530,8 @@ class _QuickMemoryIcon extends StatelessWidget {
     return Container(
       width: 44,
       height: 44,
-      decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+          color: Colors.white24, borderRadius: BorderRadius.circular(16)),
       child: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 22),
     );
   }
@@ -458,9 +559,117 @@ class _CalendarShortcut extends StatelessWidget {
           children: [
             Icon(Icons.calendar_month_rounded, color: colors.primary, size: 26),
             const SizedBox(height: 6),
-            Text('日历', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.textMain)),
+            Text('日历',
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: colors.textMain)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _RelationshipAttentionCard extends StatelessWidget {
+  final RelationshipInsight insight;
+  final AppColors colors;
+
+  const _RelationshipAttentionCard({
+    required this.insight,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = insight.status == RelationshipContactStatus.needsAttention
+        ? const Color(0xFFE17055)
+        : colors.primary;
+
+    return GlassCard(
+      colors: colors,
+      onTap: () => context.go('/people/${insight.person.id}'),
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          GradientAvatar(
+            name: insight.person.name,
+            size: 48,
+            borderRadius: 16,
+            fontSize: 18,
+            colors: colors,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        insight.person.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: colors.textMain,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _StatusPill(
+                      label: insight.statusLabel,
+                      color: accent,
+                      background: insight.status ==
+                              RelationshipContactStatus.needsAttention
+                          ? colors.softOrange
+                          : colors.softPurple,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  '${insight.lastInteractionLabel} · ${insight.actionHint}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: colors.textSub),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(Icons.chevron_right_rounded, color: colors.textSub, size: 22),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color background;
+
+  const _StatusPill({
+    required this.label,
+    required this.color,
+    required this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style:
+            TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color),
       ),
     );
   }
@@ -471,7 +680,8 @@ class _FavoriteItem extends StatelessWidget {
   final AppColors colors;
   final int colorVariant;
 
-  const _FavoriteItem({required this.person, required this.colors, required this.colorVariant});
+  const _FavoriteItem(
+      {required this.person, required this.colors, required this.colorVariant});
 
   @override
   Widget build(BuildContext context) {
@@ -486,7 +696,11 @@ class _FavoriteItem extends StatelessWidget {
           colorVariant: colorVariant,
         ),
         const SizedBox(height: 8),
-        Text(person.name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: colors.textMain)),
+        Text(person.name,
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: colors.textMain)),
       ],
     );
   }
@@ -497,11 +711,16 @@ class _FavoritePlaceCard extends StatelessWidget {
   final AppColors colors;
   final int colorVariant;
 
-  const _FavoritePlaceCard({required this.place, required this.colors, required this.colorVariant});
+  const _FavoritePlaceCard(
+      {required this.place, required this.colors, required this.colorVariant});
 
   @override
   Widget build(BuildContext context) {
-    final gradients = [colors.primaryGradient, colors.secondaryGradient, colors.primaryToLightGradient];
+    final gradients = [
+      colors.primaryGradient,
+      colors.secondaryGradient,
+      colors.primaryToLightGradient
+    ];
     return GestureDetector(
       onTap: () => context.go('/places/${place.id}'),
       child: Container(
@@ -524,11 +743,16 @@ class _FavoritePlaceCard extends StatelessWidget {
                   place.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  [place.city, place.area].where((s) => s.isNotEmpty).join(' · '),
+                  [place.city, place.area]
+                      .where((s) => s.isNotEmpty)
+                      .join(' · '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
@@ -548,13 +772,28 @@ class _RecentMemoryCard extends StatelessWidget {
   final List<Place> places;
   final AppColors colors;
 
-  const _RecentMemoryCard({required this.memory, required this.people, required this.places, required this.colors});
+  const _RecentMemoryCard(
+      {required this.memory,
+      required this.people,
+      required this.places,
+      required this.colors});
 
   @override
   Widget build(BuildContext context) {
-    final names = people.where((p) => memory.personIds.contains(p.id)).map((p) => p.name).join('、');
-    final place = places.where((p) => p.id == memory.placeId).map((p) => p.name).firstOrNull ?? '';
-    final meta = [memory.date, if (names.isNotEmpty) names, if (place.isNotEmpty) place].join(' · ');
+    final names = people
+        .where((p) => memory.personIds.contains(p.id))
+        .map((p) => p.name)
+        .join('、');
+    final place = places
+            .where((p) => p.id == memory.placeId)
+            .map((p) => p.name)
+            .firstOrNull ??
+        '';
+    final meta = [
+      memory.date,
+      if (names.isNotEmpty) names,
+      if (place.isNotEmpty) place
+    ].join(' · ');
 
     return GlassCard(
       colors: colors,
@@ -570,7 +809,8 @@ class _RecentMemoryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               gradient: colors.primaryToLightGradient,
             ),
-            child: const Icon(Icons.auto_stories_rounded, color: Colors.white, size: 20),
+            child: const Icon(Icons.auto_stories_rounded,
+                color: Colors.white, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -581,17 +821,24 @@ class _RecentMemoryCard extends StatelessWidget {
                   memory.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colors.textMain),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: colors.textMain),
                 ),
                 const SizedBox(height: 4),
-                Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: colors.textSub)),
+                Text(meta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: colors.textSub)),
                 if (memory.content.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
                     memory.content,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 13, height: 1.35, color: colors.textMain),
+                    style: TextStyle(
+                        fontSize: 13, height: 1.35, color: colors.textMain),
                   ),
                 ],
               ],
