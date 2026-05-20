@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
-        android:label="lifelog_flutter_demo"
+        android:label="LifeLog"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -9,6 +9,7 @@ import 'pages/people_list_page.dart';
 import 'pages/person_detail_page.dart';
 import 'pages/person_form_page.dart';
 import 'pages/settings_page.dart';
+import 'pages/account_page.dart';
 import 'pages/places_list_page.dart';
 import 'pages/place_detail_page.dart';
 import 'pages/place_form_page.dart';
@@ -24,6 +25,24 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/account',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const AccountPage(),
+          transitionDuration: const Duration(milliseconds: 220),
+          reverseTransitionDuration: const Duration(milliseconds: 180),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
+            return ScaleTransition(
+              alignment: Alignment.topRight,
+              scale: Tween<double>(begin: 0.86, end: 1).animate(curved),
+              child: child,
+            );
+          },
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return _AppShell(navigationShell: navigationShell);
@@ -122,15 +141,44 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-class LifeLogApp extends ConsumerWidget {
+class LifeLogApp extends ConsumerStatefulWidget {
   const LifeLogApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LifeLogApp> createState() => _LifeLogAppState();
+}
+
+class _LifeLogAppState extends ConsumerState<LifeLogApp> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      await loadPersistedPreferences(ref);
+      if (mounted) setState(() => _ready = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
     final colors = AppColors.fromStyle(style, isDark: isDark);
     final router = ref.watch(routerProvider);
+
+    if (!_ready) {
+      return MaterialApp(
+        title: 'LifeLog',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.build(colors, isDark: isDark),
+        home: GradientBackground(
+          colors: colors,
+          isDark: isDark,
+          child: const Scaffold(body: Center(child: CircularProgressIndicator())),
+        ),
+      );
+    }
 
     return MaterialApp.router(
       title: 'LifeLog',

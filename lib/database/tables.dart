@@ -17,10 +17,12 @@ class People extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+@DataClassName('PlaceRow')
 class Places extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get uuid => text().unique()();
   TextColumn get name => text()();
+  TextColumn get country => text().withDefault(const Constant('中国'))();
   TextColumn get province => text().withDefault(const Constant(''))();
   TextColumn get city => text().withDefault(const Constant(''))();
   TextColumn get area => text().withDefault(const Constant(''))();
@@ -29,6 +31,8 @@ class Places extends Table {
   TextColumn get category => text().withDefault(const Constant(''))();
   RealColumn get rating => real().withDefault(const Constant(0.0))();
   TextColumn get address => text().withDefault(const Constant(''))();
+  RealColumn get latitude => real().nullable()();
+  RealColumn get longitude => real().nullable()();
   TextColumn get mapUrl => text().withDefault(const Constant(''))();
   TextColumn get sourceUrl => text().withDefault(const Constant(''))();
   TextColumn get platformLinks => text().withDefault(const Constant('[]'))();

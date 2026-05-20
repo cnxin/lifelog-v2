@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../providers/providers.dart';
 import '../models/person.dart';
 import '../theme/app_theme.dart';
+import '../widgets/custom_datetime_picker.dart';
 import '../widgets/glass_card.dart';
 
 class PersonFormPage extends ConsumerStatefulWidget {
@@ -313,18 +314,19 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
   }
 
   Future<void> _pickBirthday() async {
+    final colors = AppColors.fromStyle(ref.read(themeStyleProvider), isDark: ref.read(themeModeProvider));
     final initial = _birthday != null ? DateTime.tryParse(_birthday!) : null;
-    final picked = await showDatePicker(
+    await showLifeLogDateTimePicker(
       context: context,
       initialDate: initial ?? DateTime(2000, 1, 1),
-      firstDate: DateTime(1920),
-      lastDate: DateTime.now(),
+      colors: colors,
+      includeTime: false,
+      onConfirm: (date, _) {
+        setState(() {
+          _birthday = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        });
+      },
     );
-    if (picked != null) {
-      setState(() {
-        _birthday = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
-      });
-    }
   }
 
   void _save() {

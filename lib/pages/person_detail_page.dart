@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/providers.dart';
+import '../models/lifelog_models.dart';
 import '../models/person.dart';
+import '../providers/providers.dart';
 import '../theme/app_theme.dart';
+import '../utils/lunar_utils.dart';
 import '../widgets/glass_card.dart';
 
 class PersonDetailPage extends ConsumerWidget {
@@ -56,6 +58,11 @@ class _DetailBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final memories = ref.watch(memoriesProvider).valueOrNull ?? [];
+    final places = ref.watch(placesProvider).valueOrNull ?? [];
+    final relatedMemories = memories.where((memory) => memory.personIds.contains(person.id)).toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -199,6 +206,14 @@ class _DetailBody extends ConsumerWidget {
                   ),
                 ),
 
+              if (relatedMemories.isNotEmpty)
+                _InfoCard(
+                  icon: Icons.auto_stories_rounded,
+                  title: '相关回忆',
+                  colors: colors,
+                  child: _RelatedMemories(memories: relatedMemories, places: places, colors: colors),
+                ),
+
               const SizedBox(height: 120),
             ]),
           ),
@@ -264,6 +279,76 @@ class _InfoCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _RelatedMemories extends StatelessWidget {
+  final List<MemoryEvent> memories;
+  final List<Place> places;
+  final AppColors colors;
+
+  const _RelatedMemories({required this.memories, required this.places, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: memories.map((memory) {
+        final place = places.where((item) => item.id == memory.placeId).firstOrNull;
+        final title = memoryDisplayTitle(memory.title, memory.content);
+        final content = memory.content.trim();
+        final tags = [memory.mood, ...memory.tags].where((item) => item.trim().isNotEmpty).toList();
+        return GestureDetector(
+          onTap: () => context.push('/memories/${memory.id}'),
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: colors.softPurple.withAlpha(110), borderRadius: BorderRadius.circular(16), border: Border.all(color: colors.line)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: colors.textMain), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    const SizedBox(width: 8),
+                    Text(memory.date, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: colors.textSub)),
+                  ],
+                ),
+                if (place != null) ...[
+                  const SizedBox(height: 6),
+                  Row(children: [Icon(Icons.place_rounded, size: 13, color: colors.textSub), const SizedBox(width: 4), Expanded(child: Text(place.name, style: TextStyle(fontSize: 12, color: colors.textSub), maxLines: 1, overflow: TextOverflow.ellipsis))]),
+                ],
+                if (content.isNotEmpty && isManualMemoryTitle(memory.title)) ...[
+                  const SizedBox(height: 8),
+                  Text(content, style: TextStyle(fontSize: 13, height: 1.4, color: colors.textMain), maxLines: 2, overflow: TextOverflow.ellipsis),
+                ],
+                if (tags.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 6, runSpacing: 5, children: tags.take(4).map((tag) => _MiniTag(label: tag, colors: colors, accent: tag == memory.mood)).toList()),
+                ],
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _MiniTag extends StatelessWidget {
+  final String label;
+  final AppColors colors;
+  final bool accent;
+
+  const _MiniTag({required this.label, required this.colors, this.accent = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(color: accent ? colors.softOrange : colors.softPurple, borderRadius: BorderRadius.circular(999)),
+      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: accent ? const Color(0xFFE17055) : colors.primary)),
     );
   }
 }

@@ -1,10 +1,10 @@
-name: lifelog_flutter_demo
+name: lifelog
 description: LifeLog Flutter + Material Design 3 - 生活记录应用
 publish_to: 'none'
-version: 1.0.0+1
+version: 0.2.0+43
 
-repository: https://github.com/your-repo/lifelog-flutter-demo
-homepage: https://github.com/your-repo/lifelog-flutter-demo
+repository: https://github.com/cnxin/lifelog
+homepage: https://github.com/cnxin/lifelog
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -18,7 +18,7 @@ dependencies:
   shared_preferences: ^2.5.3
   uuid: ^4.5.1
   intl: ^0.20.2
-  google_fonts: ^6.2.1
+  google_fonts: ^8.1.0
   flutter_local_notifications: ^18.0.1
   timezone: ^0.9.4
   image_picker: ^1.1.2

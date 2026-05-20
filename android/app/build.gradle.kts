@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cnxin.lifelog_flutter_demo"
+    namespace = "com.cnxin.lifelog"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
@@ -22,10 +22,10 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.cnxin.lifelog_flutter_demo"
+        applicationId = "com.cnxin.lifelog"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

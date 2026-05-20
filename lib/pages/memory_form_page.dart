@@ -96,23 +96,18 @@ class _MemoryFormPageState extends ConsumerState<MemoryFormPage> {
   }
 
   Future<void> _pickDateTime() async {
-    final colors = AppColors.fromStyle(ref.read(themeStyleProvider));
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => CustomDateTimePicker(
-          initialDate: DateTime.tryParse(_date) ?? DateTime.now(),
-          initialTime: _time,
-          colors: colors,
-          onConfirm: (date, time) {
-            setState(() {
-              _date = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-              _time = time;
-            });
-          },
-        ),
-      ),
+    final colors = AppColors.fromStyle(ref.read(themeStyleProvider), isDark: ref.read(themeModeProvider));
+    await showLifeLogDateTimePicker(
+      context: context,
+      initialDate: DateTime.tryParse(_date) ?? DateTime.now(),
+      initialTime: _time,
+      colors: colors,
+      onConfirm: (date, time) {
+        setState(() {
+          _date = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+          _time = time;
+        });
+      },
     );
   }
 
@@ -211,7 +206,7 @@ class _PhotoPicker extends StatelessWidget {
                       onTap: () => onRemove(index),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.black54,
                           shape: BoxShape.circle,
                         ),

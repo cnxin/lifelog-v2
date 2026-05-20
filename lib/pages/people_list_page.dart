@@ -46,14 +46,15 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
                     const SizedBox(height: 16),
                     // 搜索栏 - glass 风格
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
                             color: colors.cardBg,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: colors.line),
                             boxShadow: [colors.shadow],
                           ),
                           child: Row(
@@ -200,12 +201,12 @@ class _PersonCard extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: colors.softPurple,
+                        color: _relationshipColor(person.relationship, colors),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
                         person.relationship,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colors.primary),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _relationshipTextColor(person.relationship, colors)),
                       ),
                     ),
                     if (person.birthday != null) ...[
@@ -227,15 +228,18 @@ class _PersonCard extends ConsumerWidget {
                     children: person.preferences
                         .expand((g) => g.items)
                         .take(4)
-                        .map((item) => Container(
+                        .toList()
+                        .asMap()
+                        .entries
+                        .map((entry) => Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: colors.softPurple,
+                                color: entry.key.isEven ? colors.softPurple : colors.softOrange,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
-                                item,
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: colors.primary),
+                                entry.value,
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: entry.key.isEven ? colors.primary : colors.secondary),
                               ),
                             ))
                         .toList(),
@@ -248,5 +252,35 @@ class _PersonCard extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Color _relationshipColor(String relationship, AppColors colors) {
+  switch (relationship) {
+    case '家人':
+    case '恋人':
+      return const Color(0x1FFF8FB0);
+    case '朋友':
+      return colors.softOrange;
+    case '同事':
+    case '同学':
+      return const Color(0x1F35C7D0);
+    default:
+      return colors.softPurple;
+  }
+}
+
+Color _relationshipTextColor(String relationship, AppColors colors) {
+  switch (relationship) {
+    case '家人':
+    case '恋人':
+      return const Color(0xFFE26B91);
+    case '朋友':
+      return colors.secondary;
+    case '同事':
+    case '同学':
+      return const Color(0xFF1B95A0);
+    default:
+      return colors.primary;
   }
 }

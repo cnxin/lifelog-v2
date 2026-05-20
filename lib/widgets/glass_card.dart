@@ -32,7 +32,7 @@ class _GlassCardState extends State<GlassCard> {
       onTapUp: widget.onTap != null ? (_) { setState(() => _pressed = false); widget.onTap!(); } : null,
       onTapCancel: widget.onTap != null ? () => setState(() => _pressed = false) : null,
       child: AnimatedScale(
-        scale: _pressed ? 0.985 : 1.0,
+        scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOut,
         child: ClipRRect(
@@ -44,7 +44,7 @@ class _GlassCardState extends State<GlassCard> {
               decoration: BoxDecoration(
                 color: widget.colors.cardBg,
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                border: Border.all(color: widget.colors.line, width: 1),
+                border: Border.all(color: widget.colors.line.withAlpha(40), width: 1),
                 boxShadow: [_pressed ? widget.colors.pressShadow : widget.colors.shadow],
               ),
               padding: widget.padding ?? const EdgeInsets.all(14),
@@ -168,8 +168,8 @@ class GradientBackground extends StatelessWidget {
         color: colors.bgColor,
         gradient: RadialGradient(
           center: const Alignment(-0.68, -0.72),
-          radius: 0.6,
-          colors: [colors.primary.withAlpha(26), Colors.transparent],
+          radius: 0.7,
+          colors: [colors.primary.withAlpha(20), Colors.transparent],
           stops: const [0.0, 1.0],
         ),
       ),
@@ -180,8 +180,20 @@ class GradientBackground extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: const Alignment(0.84, 0.72),
-                  radius: 0.7,
-                  colors: [colors.secondary.withAlpha(26), Colors.transparent],
+                  radius: 0.8,
+                  colors: [colors.secondary.withAlpha(18), Colors.transparent],
+                  stops: const [0.0, 1.0],
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0.2, -0.3),
+                  radius: 0.5,
+                  colors: [colors.primaryLight.withAlpha(12), Colors.transparent],
                   stops: const [0.0, 1.0],
                 ),
               ),
@@ -255,8 +267,18 @@ class GlassBottomNav extends StatelessWidget {
                         item.$3,
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: active ? FontWeight.w700 : FontWeight.w600,
                           color: active ? colors.primary : colors.textSub,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: active ? 18 : 0,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          gradient: active ? colors.primaryGradient : null,
                         ),
                       ),
                     ],

@@ -1,354 +1,174 @@
-# LifeLog Flutter Demo
+# LifeLog v2
 
-一个使用 Flutter + Material Design 3 构建的生活记录应用，采用 Glass UI 设计风格。
+LifeLog v2 是一个基于 Flutter + Material Design 3 的生活记录应用，用于把人物、地点和回忆串联成可检索、可回顾、可备份的本地生活档案。
+
+项目从原 React/Capacitor 版本迁移而来，当前重点是移动端体验、本地优先存储、照片记录、提醒和数据可迁移性。
 
 ## 功能特性
 
-### 核心功能
-- 📱 **人物管理** - 记录联系人信息、生日、纪念日
-- 📍 **地点管理** - 收藏喜欢的地点、餐厅、咖啡厅
-- 📝 **记忆管理** - 记录生活中的美好瞬间
-- 📅 **日历视图** - 查看生日、纪念日和记忆事件
-- ⚙️ **设置中心** - 主题切换、数据管理、通知设置
+### 核心记录
+- 人物管理：姓名、昵称、关系、生日、纪念日、喜好、禁忌、备注和收藏。
+- 地点管理：城市、区域、商场、店铺、评分、地址、坐标、地图链接、平台链接、照片、标签和收藏。
+- 回忆管理：标题、日期、关联人物、关联地点、心情、正文、标签和照片。
+- 日历视图：聚合生日、纪念日和回忆事件，支持农历信息展示。
+- 账号与数据管理：本地账号说明、数据统计、完整 JSON 备份导出/导入、演示数据重置。
 
-### 高级功能
-- 📸 **照片管理** - 相册/相机选择，自动压缩
-- 🔔 **智能提醒** - 生日、纪念日、定期联系、回忆回顾四类提醒
-- 🎨 **主题系统** - 4种配色方案 + 暗色模式
-- 🔍 **全局搜索** - 快速查找人物、地点、记忆
-- 💾 **数据管理** - 导出/导入/重置数据
-- 🔗 **外部链接** - 地图、大众点评等平台链接
+### v2 补齐功能
+- 地点重复检测：按城市、商场、店名、地址、坐标等规则识别强重复和待确认重复。
+- 地点合并：保留信息更完整的地点记录，合并标签、照片、外部链接、评分和备注。
+- 合并撤销：保存地点合并前快照，可撤销最近一次合并。
+- 回忆高级筛选：按人物、地点、心情、标签组合筛选，搜索覆盖标题、正文、人物、地点、心情和标签。
+- 备份兼容：完整备份包含设置、提醒配置和地点合并历史。
 
-### 设计特色
-- ✨ **Glass UI** - 毛玻璃效果、渐变背景
-- 🎭 **Material Design 3** - 现代化的设计语言
-- 🌈 **多主题支持** - Classic/Ocean/Sunset/Forest
-- 🌙 **暗色模式** - 护眼的夜间模式
-- 📱 **响应式布局** - 适配不同屏幕尺寸
+### 移动端体验
+- 照片管理：相册/相机选择，本地保存，自动压缩，网格预览和全屏查看。
+- 智能提醒：生日/纪念日提醒、定期联系提醒、往年今日回忆提醒。
+- 主题系统：多套配色、暗色模式、Glass UI 卡片和渐变背景。
+- 深度链接路由：人物、地点、回忆详情和编辑页可直接进入。
 
 ## 技术栈
 
-- **Flutter** 3.41.9
-- **Dart** 3.7.0
-- **状态管理** - Riverpod 2.6.1
-- **路由** - go_router 14.8.1
-- **数据库** - Drift (SQLite) 2.20.3
-- **通知** - flutter_local_notifications 18.0.1
-- **照片** - image_picker 1.1.2 + flutter_image_compress 2.3.0
+| 层级 | 技术 |
+|------|------|
+| 应用框架 | Flutter |
+| 状态管理 | Riverpod |
+| 路由 | go_router |
+| 本地数据库 | Drift + SQLite |
+| Web 预览存储 | SharedPreferences 状态镜像 |
+| 本地通知 | flutter_local_notifications + timezone |
+| 图片 | image_picker + flutter_image_compress |
+| 农历 | lunar |
 
 ## 快速开始
 
-### 环境要求
+当前仓库默认分支为 `main`。
 
-- Flutter SDK >= 3.7.0
-- Dart SDK >= 3.7.0
-- Android Studio / Xcode (用于移动端开发)
-- Chrome (用于 Web 开发)
-
-详细的环境配置指南请参考 [DEVELOPMENT.md](DEVELOPMENT.md)。
-
-### 安装步骤
-
-1. **克隆项目**
-```bash
-git clone <repository-url>
-cd lifelog-flutter-demo
+```powershell
+git clone https://github.com/cnxin/lifelog-v2.git
+cd lifelog-v2
+D:\flutter\bin\flutter.bat pub get
+D:\flutter\bin\flutter.bat analyze
+D:\flutter\bin\flutter.bat test
 ```
 
-2. **使用开发脚本（推荐）**
-```bash
-# Linux/macOS
-chmod +x dev.sh
-./dev.sh setup    # 自动安装依赖、生成代码、运行分析
+如果 Flutter 已加入 PATH，也可以直接使用：
 
-# Windows
-dev.bat setup
-```
-
-3. **或手动安装**
 ```bash
-# 安装依赖
 flutter pub get
-
-# 生成 Drift 数据库代码
-flutter pub run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter test
 ```
 
-4. **运行应用**
+## 运行
+
 ```bash
-# 使用开发脚本
-./dev.sh run      # Linux/macOS
-dev.bat run       # Windows
-
-# 或手动运行
-flutter run -d chrome    # Web
-flutter run -d android   # Android
-flutter run -d ios       # iOS
+flutter run -d android
+flutter run -d chrome
 ```
 
-### 使用构建脚本（推荐）
+## 构建 Android APK
 
-**Linux/macOS:**
 ```bash
-chmod +x build.sh
-./build.sh web        # 构建 Web 版本
-./build.sh android    # 构建 Android 版本
-./build.sh all        # 构建所有平台
+flutter build apk --release
 ```
 
-**Windows:**
-```cmd
-build.bat web         # 构建 Web 版本
-build.bat android     # 构建 Android 版本
-build.bat all         # 构建所有平台
+输出文件：
+
+```text
+build/app/outputs/flutter-apk/app-release.apk
 ```
 
-构建脚本会自动执行：
-1. 清理旧构建
-2. 获取依赖
-3. 生成 Drift 代码
-4. 运行测试
-5. 代码分析
-6. 构建应用
+本仓库也会把发布包归档到 `releases/`，文件名格式示例：
 
-### 可选：生成应用图标和启动页
-
-1. 准备图标资源（参考 `ICON_SPLASH_SETUP.md`）
-2. 生成图标：
-```bash
-flutter pub run flutter_launcher_icons
-```
-3. 生成启动页：
-```bash
-flutter pub run flutter_native_splash:create
+```text
+releases/lifelog-v0.2.0+43.apk
 ```
 
 ## 项目结构
 
-```
+```text
 lib/
-├── main.dart              # 应用入口
-├── app.dart               # 路由配置
-├── models/                # 数据模型
-│   ├── person.dart
-│   └── lifelog_models.dart
-├── pages/                 # 页面（13个）
-│   ├── home_page.dart
-│   ├── people_list_page.dart
-│   ├── person_detail_page.dart
-│   ├── person_form_page.dart
-│   ├── places_list_page.dart
-│   ├── place_detail_page.dart
-│   ├── place_form_page.dart
-│   ├── memories_list_page.dart
-│   ├── memory_detail_page.dart
-│   ├── memory_form_page.dart
-│   ├── calendar_page.dart
-│   └── settings_page.dart
-├── providers/             # 状态管理
-│   └── providers.dart
-├── services/              # 服务层
-│   ├── notification_service.dart
-│   └── photo_service.dart
-├── database/              # 数据持久化
-│   ├── tables.dart
-│   ├── app_database.dart
-│   └── database_helper.dart
-├── theme/                 # 主题系统
-│   └── app_theme.dart
-└── widgets/               # 通用组件
-    └── glass_card.dart
-
-test/                      # 测试文件
-├── widget_test.dart
-├── models_test.dart
-└── services_test.dart
-
-assets/                    # 资源文件
-├── icons/
-│   └── app_icon.svg
-└── images/
-
-docs/                      # 文档
-├── MIGRATION_STATUS.md
-├── SQLITE_MIGRATION.md
-├── ICON_SPLASH_SETUP.md
-├── MIGRATION_COMPLETE.md
-└── CHANGELOG.md
+  app.dart                         # 路由和应用壳
+  main.dart                        # 启动入口
+  models/
+    person.dart                    # 人物模型
+    lifelog_models.dart            # 地点、回忆、备份和合并历史模型
+  database/
+    app_database.dart              # Drift 数据库
+    tables.dart                    # 表定义
+    database_helper.dart           # 平台条件导出
+    database_helper_native.dart    # Android/iOS SQLite 数据访问
+    database_helper_web.dart       # Web 预览数据访问
+  pages/
+    home_page.dart
+    people_list_page.dart
+    person_detail_page.dart
+    person_form_page.dart
+    places_list_page.dart
+    place_detail_page.dart
+    place_form_page.dart
+    memories_list_page.dart
+    memory_detail_page.dart
+    memory_form_page.dart
+    calendar_page.dart
+    settings_page.dart
+    account_page.dart
+  providers/
+    providers.dart                 # Riverpod 状态和业务操作
+  services/
+    notification_service.dart
+    photo_service.dart
+    location_service.dart
+  theme/
+    app_theme.dart
+  utils/
+    lunar_utils.dart
+    place_dedup.dart               # 地点重复检测与合并
+  widgets/
 ```
 
-## 开发指南
+## 验证
 
-### 运行测试
+提交前建议运行：
+
 ```bash
+flutter analyze
 flutter test
 ```
 
-### 代码检查
-```bash
-flutter analyze
-```
+当前测试覆盖：
 
-### 热重载
-开发时，修改代码后按 `r` 进行热重载，按 `R` 进行热重启。
+- 人物、地点、回忆和状态模型序列化。
+- 照片服务基础行为。
+- 应用 smoke test。
+- 地点重复检测、地点合并和回忆引用重定向。
 
-### 数据库迁移
+## 数据与隐私
 
-应用首次启动时会自动从 SharedPreferences 迁移到 SQLite。详见 `SQLITE_MIGRATION.md`。
-
-如需重新生成 Drift 代码：
-```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-```
-
-## 构建发布版本
-
-### Android
-```bash
-# APK
-flutter build apk --release
-
-# App Bundle (推荐用于 Google Play)
-flutter build appbundle --release
-```
-
-### iOS
-```bash
-flutter build ios --release
-```
-
-### Web
-```bash
-flutter build web --release
-```
-
-## 功能截图
-
-（待添加）
+- 数据默认保存在本地设备。
+- Android/iOS 使用 Drift + SQLite。
+- Web 预览使用 SharedPreferences 状态镜像。
+- 导出备份为 JSON，包含人物、地点、回忆、设置、提醒配置和地点合并历史。
+- 本项目不要求登录账号，也不默认上传数据。
 
 ## 文档
 
-- [README.md](README.md) - 项目说明（本文件）
-- [DEVELOPMENT.md](DEVELOPMENT.md) - 开发环境配置指南
-- [DEPLOYMENT.md](DEPLOYMENT.md) - 部署指南（Web/Android/iOS）
-- [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
-- [REMINDERS.md](REMINDERS.md) - 智能提醒功能说明（生日/纪念日/定期联系/回忆回顾）
-- [PREFERENCES.md](PREFERENCES.md) - 人员喜好与禁忌档案功能说明
-- [MIGRATION_STATUS.md](MIGRATION_STATUS.md) - 从 React 迁移的进度
-- [SQLITE_MIGRATION.md](SQLITE_MIGRATION.md) - 数据库迁移说明
-- [ICON_SPLASH_SETUP.md](ICON_SPLASH_SETUP.md) - 应用图标和启动页配置
-- [MIGRATION_COMPLETE.md](MIGRATION_COMPLETE.md) - 迁移工作总结
-- [CHANGELOG.md](CHANGELOG.md) - 开发日志
-- [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) - 项目总览
+- [DEVELOPMENT.md](DEVELOPMENT.md) - 开发环境配置
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Web/Android/iOS 部署
+- [REMINDERS.md](REMINDERS.md) - 智能提醒说明
+- [PREFERENCES.md](PREFERENCES.md) - 人物喜好与禁忌
+- [SQLITE_MIGRATION.md](SQLITE_MIGRATION.md) - SQLite 迁移说明
+- [ICON_SPLASH_SETUP.md](ICON_SPLASH_SETUP.md) - 图标和启动页
+- [CHANGELOG.md](CHANGELOG.md) - 变更记录
 
-## 主要依赖
+## 当前版本
 
-| 依赖 | 版本 | 用途 |
-|------|------|------|
-| flutter_riverpod | ^2.6.1 | 状态管理 |
-| go_router | ^14.8.1 | 路由导航 |
-| drift | ^2.20.3 | SQLite ORM |
-| image_picker | ^1.1.2 | 照片选择 |
-| flutter_local_notifications | ^18.0.1 | 本地通知 |
-| google_fonts | ^6.2.1 | 字体 |
-| flutter_image_compress | ^2.3.0 | 图片压缩 |
-| timezone | ^0.9.4 | 时区处理 |
+`pubspec.yaml`:
 
-完整依赖列表见 `pubspec.yaml`。
-
-## 性能优化
-
-- ✅ SQLite 数据库（查询速度提升 10-100 倍）
-- ✅ 照片自动压缩（节省存储空间）
-- ✅ 懒加载和分页（优化列表性能）
-- ✅ 状态缓存（减少重复计算）
-- ✅ 图片缓存（减少网络请求）
-
-## 已知问题
-
-1. **Flutter 环境** - 需要配置 Flutter 环境变量
-2. **首次构建** - 首次构建可能需要较长时间（下载依赖）
-3. **照片权限** - 首次使用需要授予相册/相机权限
-4. **通知权限** - Android 13+ 需要运行时权限
-
-## 故障排查
-
-### 依赖获取失败
-```bash
-flutter clean
-flutter pub get
+```yaml
+version: 0.2.0+43
 ```
 
-### Drift 代码生成失败
-```bash
-flutter pub run build_runner clean
-flutter pub run build_runner build --delete-conflicting-outputs
-```
-
-### 测试失败
-```bash
-flutter test --verbose
-```
-
-### 构建失败
-```bash
-flutter clean
-flutter pub get
-flutter pub run build_runner build --delete-conflicting-outputs
-flutter build <platform> --release
-```
-
-## 贡献指南
-
-欢迎提交 Issue 和 Pull Request！
-
-### 开发流程
-1. Fork 项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
-
-### 代码规范
-- 遵循 Flutter 官方代码风格
-- 运行 `flutter analyze` 确保无警告
-- 添加必要的测试
-- 更新相关文档
-
-## 许可证
+## License
 
 MIT License
-
-## 联系方式
-
-- 项目地址：[GitHub](https://github.com/your-repo/lifelog-flutter-demo)
-- 问题反馈：[Issues](https://github.com/your-repo/lifelog-flutter-demo/issues)
-
-## 致谢
-
-- 原 React 版本设计
-- Flutter 社区
-- Material Design 团队
-- Drift 开发团队
-- Riverpod 开发团队
-
-## 版本历史
-
-### v1.1.0 (2026-05-12)
-- ✅ 新增定期联系提醒功能
-- ✅ 新增回忆回顾提醒功能
-- ✅ 完善智能提醒系统（四类提醒）
-- ✅ 新增提醒功能文档 (REMINDERS.md)
-
-### v1.0.0 (2026-05-11)
-- ✅ 完整迁移 React 版本所有功能
-- ✅ 实现 Glass UI 设计系统
-- ✅ 集成 SQLite 数据库
-- ✅ 添加照片管理功能
-- ✅ 添加通知系统
-- ✅ 完善测试和文档
-
----
-
-**注意**：这是一个演示项目，用于展示 Flutter + Material Design 3 的开发实践。
-

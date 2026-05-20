@@ -87,7 +87,7 @@ class _PhotoViewerState extends State<PhotoViewer> {
             child: SafeArea(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,

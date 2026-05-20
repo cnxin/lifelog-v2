@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lifelog_flutter_demo/services/photo_service.dart';
+import 'package:lifelog/services/photo_service.dart';
 
 void main() {
   group('PhotoService Tests', () {

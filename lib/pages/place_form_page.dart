@@ -148,11 +148,11 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
                           gradient: colors.primaryGradient,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.map_rounded, color: Colors.white, size: 18),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text('生成地图链接', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                           ],
                         ),
@@ -435,7 +435,7 @@ class _PhotoPicker extends StatelessWidget {
                       onTap: () => onRemove(index),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.black54,
                           shape: BoxShape.circle,
                         ),

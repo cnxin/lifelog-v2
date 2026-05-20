@@ -1,4 +1,4 @@
-package com.cnxin.lifelog_flutter_demo
+package com.cnxin.lifelog
 
 import io.flutter.embedding.android.FlutterActivity
 

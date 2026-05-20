@@ -85,7 +85,10 @@ class _DashboardView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  GradientAvatar(name: 'L', size: 48, colors: colors),
+                  GestureDetector(
+                    onTap: () => context.push('/account'),
+                    child: GradientAvatar(name: 'L', size: 48, colors: colors),
+                  ),
                 ],
               ),
             ),
@@ -563,8 +566,11 @@ class _RecentMemoryCard extends StatelessWidget {
           Container(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(color: colors.softPurple, borderRadius: BorderRadius.circular(15)),
-            child: Icon(Icons.auto_stories_rounded, color: colors.primary, size: 22),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              gradient: colors.primaryToLightGradient,
+            ),
+            child: const Icon(Icons.auto_stories_rounded, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(

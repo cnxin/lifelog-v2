@@ -242,7 +242,7 @@ class AppTheme {
       ),
       navigationBarTheme: const NavigationBarThemeData(elevation: 0, backgroundColor: Colors.transparent),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(elevation: 0, highlightElevation: 0),
-      cardTheme: const CardTheme(elevation: 0, margin: EdgeInsets.zero),
+      cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
       dividerTheme: DividerThemeData(color: colors.line, thickness: 1),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -251,6 +251,42 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: colors.primary, width: 2)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: TextStyle(color: textSub, fontSize: 15),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: cardBg,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: cardBg,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: colors.primary,
+        headerForegroundColor: Colors.white,
+        dividerColor: colors.line,
+      ),
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: cardBg,
+        dialBackgroundColor: colors.softPurple,
+        hourMinuteColor: colors.softPurple,
+        dayPeriodColor: colors.softPurple,
+        entryModeIconColor: colors.primary,
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: cardBg,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll<Color>(cardBg),
+          surfaceTintColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: cardBg,
+        modalBackgroundColor: cardBg,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       ),
     );
   }

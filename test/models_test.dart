@@ -1,37 +1,35 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lifelog_flutter_demo/models/person.dart';
-import 'package:lifelog_flutter_demo/models/lifelog_models.dart';
+import 'package:lifelog/models/person.dart';
+import 'package:lifelog/models/lifelog_models.dart';
 
 void main() {
   group('Person Model Tests', () {
     test('Person creation with all fields', () {
-      final person = Person(
+      const person = Person(
         id: '1',
         name: '张三',
-        relation: '朋友',
+        nickname: '老张',
+        relationship: '朋友',
         birthday: '1990-05-15',
-        anniversary: '2020-01-01',
-        phone: '13800138000',
-        email: 'test@example.com',
-        address: '杭州市西湖区',
+        anniversaries: [Anniversary(title: '认识', date: '2020-01-01')],
+        preferences: [PreferenceGroup(category: '标签', items: ['同事', '技术'])],
+        dislikes: [PreferenceGroup(category: '忌口', items: ['香菜'])],
         notes: '测试备注',
-        tags: ['同事', '技术'],
-        photos: ['photo1.jpg'],
         favorite: true,
       );
 
       expect(person.name, '张三');
-      expect(person.relation, '朋友');
-      expect(person.tags.length, 2);
+      expect(person.relationship, '朋友');
+      expect(person.preferences.first.items.length, 2);
       expect(person.favorite, true);
     });
 
     test('Person toJson and fromJson', () {
-      final person = Person(
+      const person = Person(
         id: '1',
         name: '李四',
-        relation: '家人',
-        tags: ['家人'],
+        relationship: '家人',
+        preferences: [PreferenceGroup(category: '标签', items: ['家人'])],
         favorite: false,
       );
 
@@ -40,25 +38,25 @@ void main() {
 
       expect(restored.id, person.id);
       expect(restored.name, person.name);
-      expect(restored.relation, person.relation);
-      expect(restored.tags, person.tags);
+      expect(restored.relationship, person.relationship);
+      expect(restored.preferences.first.items, person.preferences.first.items);
       expect(restored.favorite, person.favorite);
     });
 
     test('Person copyWith', () {
-      final person = Person(id: '1', name: '王五', relation: '同事');
+      const person = Person(id: '1', name: '王五', relationship: '同事');
       final updated = person.copyWith(name: '王五五', favorite: true);
 
       expect(updated.id, '1');
       expect(updated.name, '王五五');
-      expect(updated.relation, '同事');
+      expect(updated.relationship, '同事');
       expect(updated.favorite, true);
     });
   });
 
   group('Place Model Tests', () {
     test('Place creation with external links', () {
-      final place = Place(
+      const place = Place(
         id: '1',
         name: '星巴克',
         city: '杭州',
@@ -78,7 +76,7 @@ void main() {
     });
 
     test('Place toJson and fromJson', () {
-      final place = Place(
+      const place = Place(
         id: '1',
         name: '测试地点',
         city: '杭州',
@@ -102,7 +100,7 @@ void main() {
 
   group('MemoryEvent Model Tests', () {
     test('MemoryEvent creation', () {
-      final memory = MemoryEvent(
+      const memory = MemoryEvent(
         id: '1',
         title: '周末聚会',
         date: '2026-05-11',
@@ -120,7 +118,7 @@ void main() {
     });
 
     test('MemoryEvent toJson and fromJson', () {
-      final memory = MemoryEvent(
+      const memory = MemoryEvent(
         id: '1',
         title: '测试记忆',
         date: '2026-05-11',
@@ -139,7 +137,7 @@ void main() {
     });
 
     test('MemoryEvent copyWith', () {
-      final memory = MemoryEvent(
+      const memory = MemoryEvent(
         id: '1',
         title: '原标题',
         date: '2026-05-11',
@@ -157,8 +155,8 @@ void main() {
 
   group('LifeLogState Tests', () {
     test('LifeLogState toJson and fromJson', () {
-      final state = LifeLogState(
-        people: [Person(id: '1', name: '张三', relation: '朋友')],
+      const state = LifeLogState(
+        people: [Person(id: '1', name: '张三', relationship: '朋友')],
         places: [Place(id: '1', name: '星巴克', city: '杭州', category: '咖啡厅', rating: 4.5)],
         memories: [MemoryEvent(id: '1', title: '聚会', date: '2026-05-11', mood: '开心')],
       );

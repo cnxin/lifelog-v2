@@ -12,7 +12,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(places, places.country);
+            await m.addColumn(places, places.latitude);
+            await m.addColumn(places, places.longitude);
+          }
+        },
+      );
 
   // People operations
   Future<List<person_model.Person>> getAllPeople() async {
@@ -88,6 +99,7 @@ class AppDatabase extends _$AppDatabase {
       PlacesCompanion.insert(
         uuid: place.id,
         name: place.name,
+        country: Value(place.country),
         province: Value(place.province),
         city: Value(place.city),
         area: Value(place.area),
@@ -96,6 +108,8 @@ class AppDatabase extends _$AppDatabase {
         category: Value(place.category),
         rating: Value(place.rating),
         address: Value(place.address),
+        latitude: Value(place.latitude),
+        longitude: Value(place.longitude),
         mapUrl: Value(place.mapUrl),
         sourceUrl: Value(place.sourceUrl),
         platformLinks: Value(jsonEncode(place.platformLinks.map((l) => l.toJson()).toList())),
@@ -112,6 +126,7 @@ class AppDatabase extends _$AppDatabase {
     await (update(places)..where((p) => p.uuid.equals(place.id))).write(
       PlacesCompanion(
         name: Value(place.name),
+        country: Value(place.country),
         province: Value(place.province),
         city: Value(place.city),
         area: Value(place.area),
@@ -120,6 +135,8 @@ class AppDatabase extends _$AppDatabase {
         category: Value(place.category),
         rating: Value(place.rating),
         address: Value(place.address),
+        latitude: Value(place.latitude),
+        longitude: Value(place.longitude),
         mapUrl: Value(place.mapUrl),
         sourceUrl: Value(place.sourceUrl),
         platformLinks: Value(jsonEncode(place.platformLinks.map((l) => l.toJson()).toList())),
@@ -220,10 +237,11 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  lifelog_model.Place _placeFromRow(Place row) {
+  lifelog_model.Place _placeFromRow(PlaceRow row) {
     return lifelog_model.Place(
       id: row.uuid,
       name: row.name,
+      country: row.country,
       province: row.province,
       city: row.city,
       area: row.area,
@@ -232,6 +250,8 @@ class AppDatabase extends _$AppDatabase {
       category: row.category,
       rating: row.rating,
       address: row.address,
+      latitude: row.latitude,
+      longitude: row.longitude,
       mapUrl: row.mapUrl,
       sourceUrl: row.sourceUrl,
       platformLinks: (jsonDecode(row.platformLinks) as List)
