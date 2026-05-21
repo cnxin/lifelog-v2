@@ -48,7 +48,11 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
   }
 
   void _load() {
-    final place = ref.read(placesProvider).valueOrNull?.where((p) => p.id == widget.placeId).firstOrNull;
+    final place = ref
+        .read(placesProvider)
+        .valueOrNull
+        ?.where((p) => p.id == widget.placeId)
+        .firstOrNull;
     if (place == null) return;
     _name.text = place.name;
     _city.text = place.city;
@@ -58,7 +62,9 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
     _address.text = place.address;
     _mapUrl.text = place.mapUrl;
     _sourceUrl.text = place.sourceUrl;
-    _platformLinks.text = place.platformLinks.map((link) => '${link.label}|${link.url}|${link.platform}').join('\n');
+    _platformLinks.text = place.platformLinks
+        .map((link) => '${link.label}|${link.url}|${link.platform}')
+        .join('\n');
     _desc.text = place.desc;
     _tags.text = place.tags.join('，');
     if (place.latitude != null) _latitude.text = place.latitude.toString();
@@ -91,91 +97,232 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppColors.fromStyle(ref.watch(themeStyleProvider));
+    final isDark = ref.watch(themeModeProvider);
+    final colors =
+        AppColors.fromStyle(ref.watch(themeStyleProvider), isDark: isDark);
     return GradientBackground(
       colors: colors,
-      isDark: ref.watch(themeModeProvider),
+      isDark: isDark,
       child: Scaffold(
         body: SafeArea(
           child: Column(children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: Row(children: [
-                IconButton(icon: Icon(Icons.arrow_back_ios_new, size: 20, color: colors.textMain), onPressed: () => context.pop()),
+                IconButton(
+                    icon: Icon(Icons.arrow_back_ios_new,
+                        size: 20, color: colors.textMain),
+                    onPressed: () => context.pop()),
                 const Spacer(),
-                Text(isEditing ? '编辑地点' : '新建地点', style: TextStyle(fontFamily: 'Outfit', fontSize: 18, fontWeight: FontWeight.w600, color: colors.textMain)),
+                Text(isEditing ? '编辑地点' : '新建地点',
+                    style: TextStyle(
+                        fontFamily: 'Outfit',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: colors.textMain)),
                 const Spacer(),
-                GestureDetector(onTap: _save, child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), decoration: BoxDecoration(gradient: colors.primaryGradient, borderRadius: BorderRadius.circular(14)), child: const Text('保存', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)))),
+                GestureDetector(
+                    onTap: _save,
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                            gradient: colors.primaryGradient,
+                            borderRadius: BorderRadius.circular(14)),
+                        child: const Text('保存',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600)))),
                 const SizedBox(width: 8),
               ]),
             ),
             Expanded(
-              child: ListView(padding: const EdgeInsets.fromLTRB(24, 16, 24, 40), children: [
-                _Input(label: '名称 *', controller: _name, icon: Icons.place_rounded, colors: colors),
-                const SizedBox(height: 16),
-                Text('分类', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
-                const SizedBox(height: 8),
-                Wrap(spacing: 8, runSpacing: 8, children: categories.map((cat) => _Choice(label: cat, selected: cat == _category, colors: colors, onTap: () => setState(() => _category = cat))).toList()),
-                const SizedBox(height: 16),
-                _Input(label: '城市', controller: _city, icon: Icons.location_city_rounded, colors: colors),
-                const SizedBox(height: 16),
-                Row(children: [Expanded(child: _Input(label: '区域', controller: _area, icon: Icons.map_rounded, colors: colors)), const SizedBox(width: 12), Expanded(child: _Input(label: '商场', controller: _mall, icon: Icons.store_mall_directory_rounded, colors: colors))]),
-                const SizedBox(height: 16),
-                _Input(label: '店铺/厅名', controller: _storeName, icon: Icons.storefront_rounded, colors: colors),
-                const SizedBox(height: 16),
-                Text('评分 ${_rating.toStringAsFixed(1)}', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
-                Slider(value: _rating, min: 0, max: 5, divisions: 10, activeColor: colors.primary, onChanged: (v) => setState(() => _rating = v)),
-                const SizedBox(height: 16),
-                _Input(label: '地址', controller: _address, icon: Icons.route_rounded, colors: colors),
-                const SizedBox(height: 16),
-                Text('定位坐标（可选）', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
-                const SizedBox(height: 8),
-                Row(
+              child: ListView(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
                   children: [
-                    Expanded(child: _Input(label: '纬度', controller: _latitude, icon: Icons.location_on_rounded, colors: colors)),
-                    const SizedBox(width: 12),
-                    Expanded(child: _Input(label: '经度', controller: _longitude, icon: Icons.location_on_rounded, colors: colors)),
-                  ],
-                ),
-                if (_latitude.text.isNotEmpty && _longitude.text.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: GestureDetector(
-                      onTap: _generateMapUrl,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          gradient: colors.primaryGradient,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.map_rounded, color: Colors.white, size: 18),
-                            SizedBox(width: 8),
-                            Text('生成地图链接', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                          ],
+                    _Input(
+                        label: '名称 *',
+                        controller: _name,
+                        icon: Icons.place_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    Text('分类',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: colors.textSub)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: categories
+                            .map((cat) => _Choice(
+                                label: cat,
+                                selected: cat == _category,
+                                colors: colors,
+                                onTap: () => setState(() => _category = cat)))
+                            .toList()),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '城市',
+                        controller: _city,
+                        icon: Icons.location_city_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    Row(children: [
+                      Expanded(
+                          child: _Input(
+                              label: '区域',
+                              controller: _area,
+                              icon: Icons.map_rounded,
+                              colors: colors)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                          child: _Input(
+                              label: '商场',
+                              controller: _mall,
+                              icon: Icons.store_mall_directory_rounded,
+                              colors: colors))
+                    ]),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '店铺/厅名',
+                        controller: _storeName,
+                        icon: Icons.storefront_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    Text('评分 ${_rating.toStringAsFixed(1)}',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: colors.textSub)),
+                    Slider(
+                        value: _rating,
+                        min: 0,
+                        max: 5,
+                        divisions: 10,
+                        activeColor: colors.primary,
+                        onChanged: (v) => setState(() => _rating = v)),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '地址',
+                        controller: _address,
+                        icon: Icons.route_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    Text('定位坐标（可选）',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: colors.textSub)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: _Input(
+                                label: '纬度',
+                                controller: _latitude,
+                                icon: Icons.location_on_rounded,
+                                colors: colors)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                            child: _Input(
+                                label: '经度',
+                                controller: _longitude,
+                                icon: Icons.location_on_rounded,
+                                colors: colors)),
+                      ],
+                    ),
+                    if (_latitude.text.isNotEmpty && _longitude.text.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: GestureDetector(
+                          onTap: _generateMapUrl,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: colors.primaryGradient,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.map_rounded,
+                                    color: Colors.white, size: 18),
+                                SizedBox(width: 8),
+                                Text('生成地图链接',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                _Input(label: '地图链接', controller: _mapUrl, icon: Icons.map_rounded, colors: colors),
-                const SizedBox(height: 16),
-                _Input(label: '来源链接', controller: _sourceUrl, icon: Icons.link_rounded, colors: colors),
-                const SizedBox(height: 16),
-                _Input(label: '平台链接（每行：名称|链接|平台）', controller: _platformLinks, icon: Icons.hub_rounded, colors: colors, maxLines: 3),
-                const SizedBox(height: 16),
-                _Input(label: '标签（逗号分隔）', controller: _tags, icon: Icons.sell_rounded, colors: colors),
-                const SizedBox(height: 16),
-                Text('照片', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
-                const SizedBox(height: 8),
-                _PhotoPicker(photos: _photosPaths, colors: colors, onAdd: _addPhotos, onRemove: _removePhoto),
-                const SizedBox(height: 16),
-                _Input(label: '备注', controller: _desc, icon: Icons.note_rounded, colors: colors, maxLines: 3),
-                const SizedBox(height: 16),
-                GlassCard(colors: colors, onTap: () => setState(() => _favorite = !_favorite), child: Row(children: [Icon(_favorite ? Icons.star_rounded : Icons.star_outline_rounded, color: _favorite ? const Color(0xFFFDCB6E) : colors.textSub), const SizedBox(width: 12), Text('收藏', style: TextStyle(color: colors.textMain)), const Spacer(), Text(_favorite ? '已收藏' : '未收藏', style: TextStyle(color: colors.textSub, fontSize: 12))])),
-              ]),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '地图链接',
+                        controller: _mapUrl,
+                        icon: Icons.map_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '来源链接',
+                        controller: _sourceUrl,
+                        icon: Icons.link_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '平台链接（每行：名称|链接|平台）',
+                        controller: _platformLinks,
+                        icon: Icons.hub_rounded,
+                        colors: colors,
+                        maxLines: 3),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '标签（逗号分隔）',
+                        controller: _tags,
+                        icon: Icons.sell_rounded,
+                        colors: colors),
+                    const SizedBox(height: 16),
+                    Text('照片',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: colors.textSub)),
+                    const SizedBox(height: 8),
+                    _PhotoPicker(
+                        photos: _photosPaths,
+                        colors: colors,
+                        onAdd: _addPhotos,
+                        onRemove: _removePhoto),
+                    const SizedBox(height: 16),
+                    _Input(
+                        label: '备注',
+                        controller: _desc,
+                        icon: Icons.note_rounded,
+                        colors: colors,
+                        maxLines: 3),
+                    const SizedBox(height: 16),
+                    GlassCard(
+                        colors: colors,
+                        onTap: () => setState(() => _favorite = !_favorite),
+                        child: Row(children: [
+                          Icon(
+                              _favorite
+                                  ? Icons.star_rounded
+                                  : Icons.star_outline_rounded,
+                              color: _favorite
+                                  ? const Color(0xFFFDCB6E)
+                                  : colors.textSub),
+                          const SizedBox(width: 12),
+                          Text('收藏', style: TextStyle(color: colors.textMain)),
+                          const Spacer(),
+                          Text(_favorite ? '已收藏' : '未收藏',
+                              style: TextStyle(
+                                  color: colors.textSub, fontSize: 12))
+                        ])),
+                  ]),
             ),
           ]),
         ),
@@ -194,15 +341,16 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
         final existingName = p.name.toLowerCase();
         // 简单的相似度检测：包含关系或编辑距离小
         return existingName.contains(newName) ||
-               newName.contains(existingName) ||
-               _levenshteinDistance(existingName, newName) <= 2;
+            newName.contains(existingName) ||
+            _levenshteinDistance(existingName, newName) <= 2;
       }).toList();
 
       if (duplicates.isNotEmpty && mounted) {
         final shouldContinue = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: const Text('可能重复'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -211,9 +359,10 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
                 const Text('发现相似的地点：'),
                 const SizedBox(height: 8),
                 ...duplicates.map((p) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Text('• ${p.name}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                )),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text('• ${p.name}',
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                    )),
                 const SizedBox(height: 12),
                 const Text('确定要继续添加吗？'),
               ],
@@ -235,7 +384,11 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
       }
     }
 
-    final tags = _tags.text.split(RegExp(r'[,，]')).map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+    final tags = _tags.text
+        .split(RegExp(r'[,，]'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
 
     double? lat;
     double? lng;
@@ -277,7 +430,8 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
 
     if (lat != null && lng != null) {
       final locationService = LocationService();
-      if (locationService.isValidLatitude(lat) && locationService.isValidLongitude(lng)) {
+      if (locationService.isValidLatitude(lat) &&
+          locationService.isValidLongitude(lng)) {
         final url = locationService.generateMapUrl(lat, lng, _name.text.trim());
         _mapUrl.text = url;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -342,7 +496,8 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
           return PlaceExternalLink(
             label: parts.isNotEmpty && parts[0].isNotEmpty ? parts[0] : '链接',
             url: parts.length > 1 ? parts[1] : '',
-            platform: parts.length > 2 && parts[2].isNotEmpty ? parts[2] : 'custom',
+            platform:
+                parts.length > 2 && parts[2].isNotEmpty ? parts[2] : 'custom',
           );
         })
         .where((link) => link.url.isNotEmpty)
@@ -356,14 +511,36 @@ class _Input extends StatelessWidget {
   final IconData icon;
   final AppColors colors;
   final int maxLines;
-  const _Input({required this.label, required this.controller, required this.icon, required this.colors, this.maxLines = 1});
+  const _Input(
+      {required this.label,
+      required this.controller,
+      required this.icon,
+      required this.colors,
+      this.maxLines = 1});
 
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub)),
-    const SizedBox(height: 8),
-    GlassCard(colors: colors, padding: EdgeInsets.zero, child: TextField(controller: controller, maxLines: maxLines, style: TextStyle(color: colors.textMain), decoration: InputDecoration(prefixIcon: Icon(icon, color: colors.textSub, size: 20), border: InputBorder.none, filled: false, contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14)))),
-  ]);
+  Widget build(BuildContext context) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label,
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colors.textSub)),
+        const SizedBox(height: 8),
+        GlassCard(
+            colors: colors,
+            padding: EdgeInsets.zero,
+            child: TextField(
+                controller: controller,
+                maxLines: maxLines,
+                style: TextStyle(color: colors.textMain),
+                decoration: InputDecoration(
+                    prefixIcon: Icon(icon, color: colors.textSub, size: 20),
+                    border: InputBorder.none,
+                    filled: false,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14)))),
+      ]);
 }
 
 class _Choice extends StatelessWidget {
@@ -371,10 +548,29 @@ class _Choice extends StatelessWidget {
   final bool selected;
   final AppColors colors;
   final VoidCallback onTap;
-  const _Choice({required this.label, required this.selected, required this.colors, required this.onTap});
+  const _Choice(
+      {required this.label,
+      required this.selected,
+      required this.colors,
+      required this.onTap});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: AnimatedContainer(duration: const Duration(milliseconds: 160), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9), decoration: BoxDecoration(gradient: selected ? colors.primaryGradient : null, color: selected ? null : colors.cardBg, borderRadius: BorderRadius.circular(999), border: selected ? null : Border.all(color: colors.line), boxShadow: [colors.shadow]), child: Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: selected ? Colors.white : colors.textMain))));
+  Widget build(BuildContext context) => GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+              gradient: selected ? colors.primaryGradient : null,
+              color: selected ? null : colors.cardBg,
+              borderRadius: BorderRadius.circular(999),
+              border: selected ? null : Border.all(color: colors.line),
+              boxShadow: [colors.shadow]),
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: selected ? Colors.white : colors.textMain))));
 }
 
 class _PhotoPicker extends StatelessWidget {
@@ -383,7 +579,11 @@ class _PhotoPicker extends StatelessWidget {
   final VoidCallback onAdd;
   final void Function(int) onRemove;
 
-  const _PhotoPicker({required this.photos, required this.colors, required this.onAdd, required this.onRemove});
+  const _PhotoPicker(
+      {required this.photos,
+      required this.colors,
+      required this.onAdd,
+      required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -423,7 +623,8 @@ class _PhotoPicker extends StatelessWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: colors.softPurple,
-                          child: Icon(Icons.broken_image_rounded, color: colors.primary),
+                          child: Icon(Icons.broken_image_rounded,
+                              color: colors.primary),
                         ),
                       ),
                     ),
@@ -439,7 +640,8 @@ class _PhotoPicker extends StatelessWidget {
                           color: Colors.black54,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.close, color: Colors.white, size: 16),
+                        child: const Icon(Icons.close,
+                            color: Colors.white, size: 16),
                       ),
                     ),
                   ),
@@ -452,15 +654,19 @@ class _PhotoPicker extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                border: Border.all(color: colors.line, width: 2, style: BorderStyle.solid),
+                border: Border.all(
+                    color: colors.line, width: 2, style: BorderStyle.solid),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_photo_alternate_rounded, color: colors.primary, size: 20),
+                  Icon(Icons.add_photo_alternate_rounded,
+                      color: colors.primary, size: 20),
                   const SizedBox(width: 8),
-                  Text('添加照片', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w600)),
+                  Text('添加照片',
+                      style: TextStyle(
+                          color: colors.primary, fontWeight: FontWeight.w600)),
                 ],
               ),
             ),

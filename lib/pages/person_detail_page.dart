@@ -17,8 +17,8 @@ class PersonDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final peopleAsync = ref.watch(peopleProvider);
     final style = ref.watch(themeStyleProvider);
-    final colors =
-        AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
+    final isDark = ref.watch(themeModeProvider);
+    final colors = AppColors.fromStyle(style, isDark: isDark);
 
     return peopleAsync.when(
       loading: () =>
@@ -29,12 +29,14 @@ class PersonDetailPage extends ConsumerWidget {
         if (person == null) {
           return GradientBackground(
             colors: colors,
+            isDark: isDark,
             child: Scaffold(
                 appBar: AppBar(), body: const Center(child: Text('人物不存在'))),
           );
         }
         return GradientBackground(
           colors: colors,
+          isDark: isDark,
           child: Scaffold(
             body: _DetailBody(person: person, colors: colors),
             floatingActionButton: Row(

@@ -28,9 +28,16 @@ class _GlassCardState extends State<GlassCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
-      onTapUp: widget.onTap != null ? (_) { setState(() => _pressed = false); widget.onTap!(); } : null,
-      onTapCancel: widget.onTap != null ? () => setState(() => _pressed = false) : null,
+      onTapDown:
+          widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
+      onTapUp: widget.onTap != null
+          ? (_) {
+              setState(() => _pressed = false);
+              widget.onTap!();
+            }
+          : null,
+      onTapCancel:
+          widget.onTap != null ? () => setState(() => _pressed = false) : null,
       child: AnimatedScale(
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 160),
@@ -44,8 +51,11 @@ class _GlassCardState extends State<GlassCard> {
               decoration: BoxDecoration(
                 color: widget.colors.cardBg,
                 borderRadius: BorderRadius.circular(widget.borderRadius),
-                border: Border.all(color: widget.colors.line.withAlpha(40), width: 1),
-                boxShadow: [_pressed ? widget.colors.pressShadow : widget.colors.shadow],
+                border: Border.all(
+                    color: widget.colors.line.withAlpha(40), width: 1),
+                boxShadow: [
+                  _pressed ? widget.colors.pressShadow : widget.colors.shadow
+                ],
               ),
               padding: widget.padding ?? const EdgeInsets.all(14),
               child: widget.child,
@@ -156,20 +166,16 @@ class GradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isDark) {
-      return Container(
-        color: const Color(0xFF1A1A2E),
-        child: child,
-      );
-    }
-
     return Container(
       decoration: BoxDecoration(
         color: colors.bgColor,
         gradient: RadialGradient(
           center: const Alignment(-0.68, -0.72),
           radius: 0.7,
-          colors: [colors.primary.withAlpha(20), Colors.transparent],
+          colors: [
+            colors.primary.withAlpha(isDark ? 30 : 20),
+            Colors.transparent,
+          ],
           stops: const [0.0, 1.0],
         ),
       ),
@@ -181,7 +187,10 @@ class GradientBackground extends StatelessWidget {
                 gradient: RadialGradient(
                   center: const Alignment(0.84, 0.72),
                   radius: 0.8,
-                  colors: [colors.secondary.withAlpha(18), Colors.transparent],
+                  colors: [
+                    colors.secondary.withAlpha(isDark ? 24 : 18),
+                    Colors.transparent,
+                  ],
                   stops: const [0.0, 1.0],
                 ),
               ),
@@ -193,7 +202,10 @@ class GradientBackground extends StatelessWidget {
                 gradient: RadialGradient(
                   center: const Alignment(0.2, -0.3),
                   radius: 0.5,
-                  colors: [colors.primaryLight.withAlpha(12), Colors.transparent],
+                  colors: [
+                    colors.primaryLight.withAlpha(isDark ? 18 : 12),
+                    Colors.transparent,
+                  ],
                   stops: const [0.0, 1.0],
                 ),
               ),
@@ -252,7 +264,8 @@ class GlassBottomNav extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOut,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   transform: Matrix4.translationValues(0, active ? -2 : 0, 0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -267,7 +280,8 @@ class GlassBottomNav extends StatelessWidget {
                         item.$3,
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+                          fontWeight:
+                              active ? FontWeight.w700 : FontWeight.w600,
                           color: active ? colors.primary : colors.textSub,
                         ),
                       ),

@@ -49,22 +49,22 @@ class AppColors {
   });
 
   Gradient get primaryGradient => LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [primary, secondary],
-  );
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [primary, secondary],
+      );
 
   Gradient get primaryToLightGradient => LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [primary, primaryLight],
-  );
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [primary, primaryLight],
+      );
 
   Gradient get secondaryGradient => LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: gradientColors,
-  );
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: gradientColors,
+      );
 
   static const classic = AppColors(
     primary: Color(0xFF7C8CF8),
@@ -78,10 +78,14 @@ class AppColors {
     line: Color(0x1A7C8CF8),
     softPurple: Color(0x177C8CF8),
     softOrange: Color(0x1FF5A3AE),
-    shadow: BoxShadow(color: Color(0x0D37416E), blurRadius: 22, offset: Offset(0, 8)),
-    pressShadow: BoxShadow(color: Color(0x1437416E), blurRadius: 14, offset: Offset(0, 4)),
-    avatarShadow: BoxShadow(color: Color(0x3D6C5CE7), blurRadius: 22, offset: Offset(0, 10)),
-    fabShadow: BoxShadow(color: Color(0x335B6CFF), blurRadius: 20, offset: Offset(0, 10)),
+    shadow: BoxShadow(
+        color: Color(0x0D37416E), blurRadius: 22, offset: Offset(0, 8)),
+    pressShadow: BoxShadow(
+        color: Color(0x1437416E), blurRadius: 14, offset: Offset(0, 4)),
+    avatarShadow: BoxShadow(
+        color: Color(0x3D6C5CE7), blurRadius: 22, offset: Offset(0, 10)),
+    fabShadow: BoxShadow(
+        color: Color(0x335B6CFF), blurRadius: 20, offset: Offset(0, 10)),
     gradientColors: [Color(0xFFF5ADB7), Color(0xFFFF9A8D)],
   );
 
@@ -97,10 +101,14 @@ class AppColors {
     line: Color(0x24B08553),
     softPurple: Color(0x179F7B55),
     softOrange: Color(0x3DE8CDA6),
-    shadow: BoxShadow(color: Color(0x0F75583A), blurRadius: 24, offset: Offset(0, 10)),
-    pressShadow: BoxShadow(color: Color(0x1775583A), blurRadius: 16, offset: Offset(0, 5)),
-    avatarShadow: BoxShadow(color: Color(0x3D75583A), blurRadius: 22, offset: Offset(0, 10)),
-    fabShadow: BoxShadow(color: Color(0x3375583A), blurRadius: 20, offset: Offset(0, 10)),
+    shadow: BoxShadow(
+        color: Color(0x0F75583A), blurRadius: 24, offset: Offset(0, 10)),
+    pressShadow: BoxShadow(
+        color: Color(0x1775583A), blurRadius: 16, offset: Offset(0, 5)),
+    avatarShadow: BoxShadow(
+        color: Color(0x3D75583A), blurRadius: 22, offset: Offset(0, 10)),
+    fabShadow: BoxShadow(
+        color: Color(0x3375583A), blurRadius: 20, offset: Offset(0, 10)),
     gradientColors: [Color(0xFFEAD7BD), Color(0xFFD7BEA1)],
   );
 
@@ -116,10 +124,14 @@ class AppColors {
     line: Color(0x2912B886),
     softPurple: Color(0x2112B886),
     softOrange: Color(0x334DABF7),
-    shadow: BoxShadow(color: Color(0x1412B886), blurRadius: 26, offset: Offset(0, 12)),
-    pressShadow: BoxShadow(color: Color(0x1F12B886), blurRadius: 16, offset: Offset(0, 5)),
-    avatarShadow: BoxShadow(color: Color(0x3D12B886), blurRadius: 22, offset: Offset(0, 10)),
-    fabShadow: BoxShadow(color: Color(0x3312B886), blurRadius: 20, offset: Offset(0, 10)),
+    shadow: BoxShadow(
+        color: Color(0x1412B886), blurRadius: 26, offset: Offset(0, 12)),
+    pressShadow: BoxShadow(
+        color: Color(0x1F12B886), blurRadius: 16, offset: Offset(0, 5)),
+    avatarShadow: BoxShadow(
+        color: Color(0x3D12B886), blurRadius: 22, offset: Offset(0, 10)),
+    fabShadow: BoxShadow(
+        color: Color(0x3312B886), blurRadius: 20, offset: Offset(0, 10)),
     gradientColors: [Color(0xFF4DABF7), Color(0xFF8CEFD8)],
   );
 
@@ -135,10 +147,14 @@ class AppColors {
     line: Color(0x171F2937),
     softPurple: Color(0x0F4B5563),
     softOrange: Color(0x1F9CA3AF),
-    shadow: BoxShadow(color: Color(0x0A111827), blurRadius: 18, offset: Offset(0, 6)),
-    pressShadow: BoxShadow(color: Color(0x12111827), blurRadius: 12, offset: Offset(0, 3)),
-    avatarShadow: BoxShadow(color: Color(0x3D4B5563), blurRadius: 22, offset: Offset(0, 10)),
-    fabShadow: BoxShadow(color: Color(0x334B5563), blurRadius: 20, offset: Offset(0, 10)),
+    shadow: BoxShadow(
+        color: Color(0x0A111827), blurRadius: 18, offset: Offset(0, 6)),
+    pressShadow: BoxShadow(
+        color: Color(0x12111827), blurRadius: 12, offset: Offset(0, 3)),
+    avatarShadow: BoxShadow(
+        color: Color(0x3D4B5563), blurRadius: 22, offset: Offset(0, 10)),
+    fabShadow: BoxShadow(
+        color: Color(0x334B5563), blurRadius: 20, offset: Offset(0, 10)),
     gradientColors: [Color(0xFF9CA3AF), Color(0xFF7B8796)],
   );
 
@@ -156,18 +172,26 @@ class AppColors {
       primary: base.primaryLight,
       primaryLight: const Color(0xFFC7D0FF),
       secondary: base.secondary,
-      bgColor: const Color(0xFF12131D),
-      cardBg: const Color(0xE62A2C3D),
-      cardSolid: const Color(0xFF2A2C3D),
+      bgColor: const Color(0xFF161827),
+      cardBg: const Color(0xD92B2E42),
+      cardSolid: const Color(0xFF2B2E42),
       textMain: const Color(0xFFF4F6FF),
       textSub: const Color(0xFFB6BCD4),
       line: const Color(0x26FFFFFF),
       softPurple: base.primary.withAlpha(54),
       softOrange: base.secondary.withAlpha(48),
-      shadow: const BoxShadow(color: Color(0x52000000), blurRadius: 26, offset: Offset(0, 12)),
-      pressShadow: const BoxShadow(color: Color(0x66000000), blurRadius: 14, offset: Offset(0, 5)),
-      avatarShadow: BoxShadow(color: base.primary.withAlpha(92), blurRadius: 28, offset: const Offset(0, 12)),
-      fabShadow: BoxShadow(color: base.primary.withAlpha(82), blurRadius: 24, offset: const Offset(0, 12)),
+      shadow: const BoxShadow(
+          color: Color(0x52000000), blurRadius: 26, offset: Offset(0, 12)),
+      pressShadow: const BoxShadow(
+          color: Color(0x66000000), blurRadius: 14, offset: Offset(0, 5)),
+      avatarShadow: BoxShadow(
+          color: base.primary.withAlpha(92),
+          blurRadius: 28,
+          offset: const Offset(0, 12)),
+      fabShadow: BoxShadow(
+          color: base.primary.withAlpha(82),
+          blurRadius: 24,
+          offset: const Offset(0, 12)),
       gradientColors: const [Color(0xFF171827), Color(0xFF10111A)],
     );
   }
@@ -176,10 +200,10 @@ class AppColors {
 class AppTheme {
   static ThemeData build(AppColors colors, {bool isDark = false}) {
     final brightness = isDark ? Brightness.dark : Brightness.light;
-    final bg = isDark ? const Color(0xFF1A1A2E) : colors.bgColor;
-    final cardBg = isDark ? const Color(0xD924243A) : colors.cardSolid;
-    final textMain = isDark ? const Color(0xFFF8F9FA) : colors.textMain;
-    final textSub = isDark ? const Color(0xFFB2BEC3) : colors.textSub;
+    final bg = colors.bgColor;
+    final cardBg = colors.cardSolid;
+    final textMain = colors.textMain;
+    final textSub = colors.textSub;
 
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -219,18 +243,68 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: Colors.transparent,
       textTheme: TextTheme(
-        headlineLarge: TextStyle(fontFamily: headingFamily, fontSize: 28, fontWeight: FontWeight.w700, color: textMain, height: 1.18),
-        headlineMedium: TextStyle(fontFamily: headingFamily, fontSize: 24, fontWeight: FontWeight.w700, color: textMain),
-        headlineSmall: TextStyle(fontFamily: headingFamily, fontSize: 22, fontWeight: FontWeight.w600, color: textMain),
-        titleLarge: TextStyle(fontFamily: headingFamily, fontSize: 18, fontWeight: FontWeight.w600, color: textMain),
-        titleMedium: TextStyle(fontFamily: bodyFamily, fontSize: 16, fontWeight: FontWeight.w600, color: textMain),
-        titleSmall: TextStyle(fontFamily: bodyFamily, fontSize: 14, fontWeight: FontWeight.w600, color: textMain),
-        bodyLarge: TextStyle(fontFamily: bodyFamily, fontSize: 15, fontWeight: FontWeight.w400, color: textMain),
-        bodyMedium: TextStyle(fontFamily: bodyFamily, fontSize: 13, fontWeight: FontWeight.w400, color: textSub),
-        bodySmall: TextStyle(fontFamily: bodyFamily, fontSize: 12, fontWeight: FontWeight.w400, color: textSub),
-        labelLarge: TextStyle(fontFamily: bodyFamily, fontSize: 14, fontWeight: FontWeight.w600, color: textMain),
-        labelMedium: TextStyle(fontFamily: bodyFamily, fontSize: 12, fontWeight: FontWeight.w700, color: colors.primary, letterSpacing: 0.04 * 12),
-        labelSmall: TextStyle(fontFamily: bodyFamily, fontSize: 10, fontWeight: FontWeight.w600, color: textSub),
+        headlineLarge: TextStyle(
+            fontFamily: headingFamily,
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: textMain,
+            height: 1.18),
+        headlineMedium: TextStyle(
+            fontFamily: headingFamily,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: textMain),
+        headlineSmall: TextStyle(
+            fontFamily: headingFamily,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: textMain),
+        titleLarge: TextStyle(
+            fontFamily: headingFamily,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: textMain),
+        titleMedium: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: textMain),
+        titleSmall: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: textMain),
+        bodyLarge: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: textMain),
+        bodyMedium: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 13,
+            fontWeight: FontWeight.w400,
+            color: textSub),
+        bodySmall: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: textSub),
+        labelLarge: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: textMain),
+        labelMedium: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: colors.primary,
+            letterSpacing: 0.04 * 12),
+        labelSmall: TextStyle(
+            fontFamily: bodyFamily,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: textSub),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -238,18 +312,29 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(fontFamily: headingFamily, fontSize: 18, fontWeight: FontWeight.w600, color: textMain),
+        titleTextStyle: TextStyle(
+            fontFamily: headingFamily,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: textMain),
       ),
-      navigationBarTheme: const NavigationBarThemeData(elevation: 0, backgroundColor: Colors.transparent),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(elevation: 0, highlightElevation: 0),
+      navigationBarTheme: const NavigationBarThemeData(
+          elevation: 0, backgroundColor: Colors.transparent),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          elevation: 0, highlightElevation: 0),
       cardTheme: const CardThemeData(elevation: 0, margin: EdgeInsets.zero),
       dividerTheme: DividerThemeData(color: colors.line, thickness: 1),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colors.softPurple,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: colors.primary, width: 2)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: colors.primary, width: 2)),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: TextStyle(color: textSub, fontSize: 15),
       ),
       dialogTheme: DialogThemeData(
@@ -279,14 +364,16 @@ class AppTheme {
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
           backgroundColor: WidgetStatePropertyAll<Color>(cardBg),
-          surfaceTintColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+          surfaceTintColor:
+              const WidgetStatePropertyAll<Color>(Colors.transparent),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: cardBg,
         modalBackgroundColor: cardBg,
         surfaceTintColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       ),
     );
   }
