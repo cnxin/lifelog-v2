@@ -84,7 +84,7 @@ build/app/outputs/flutter-apk/app-release.apk
 本仓库也会把发布包归档到 `releases/`，文件名格式示例：
 
 ```text
-releases/lifelog-v0.3.2+46.apk
+releases/lifelog-v0.3.3+47.apk
 ```
 
 ## 项目结构
@@ -186,7 +186,7 @@ v2 使用独立应用标识，可与原版 LifeLog 同时安装。
 `pubspec.yaml`:
 
 ```yaml
-version: 0.3.2+46
+version: 0.3.3+47
 ```
 
 ## License
