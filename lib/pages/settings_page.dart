@@ -14,7 +14,8 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentStyle = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(currentStyle, isDark: isDark);
+    final dynamicColorEnabled = ref.watch(dynamicColorEnabledProvider);
+    final colors = ref.watch(appColorsProvider);
     final theme = Theme.of(context);
     final duplicateGroups = ref.watch(duplicatePlaceGroupsProvider);
     final mergeHistory = ref.watch(placeMergeHistoryProvider).valueOrNull ??
@@ -114,6 +115,51 @@ class SettingsPage extends ConsumerWidget {
                       ),
                     );
                   }).toList(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              GlassCard(
+                colors: colors,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                onTap: () async {
+                  ref.read(dynamicColorEnabledProvider.notifier).state =
+                      !dynamicColorEnabled;
+                  await saveCurrentPreferences(ref);
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: colors.softPurple,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.wallpaper_rounded,
+                        size: 20,
+                        color: colors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text('动态取色',
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: colors.textMain)),
+                    ),
+                    Switch(
+                      value: dynamicColorEnabled,
+                      onChanged: (v) async {
+                        ref.read(dynamicColorEnabledProvider.notifier).state =
+                            v;
+                        await saveCurrentPreferences(ref);
+                      },
+                      activeThumbColor: colors.primary,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
@@ -1027,7 +1073,7 @@ class SettingsPage extends ConsumerWidget {
 
   Future<void> _editCustomOptions(BuildContext context, WidgetRef ref,
       StateProvider<List<String>> provider, String title) async {
-    final colors = AppColors.fromStyle(ref.read(themeStyleProvider));
+    final colors = ref.read(appColorsProvider);
     final currentOptions = List<String>.from(ref.read(provider));
     final controller = TextEditingController();
 

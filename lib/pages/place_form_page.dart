@@ -98,8 +98,7 @@ class _PlaceFormPageState extends ConsumerState<PlaceFormPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider);
-    final colors =
-        AppColors.fromStyle(ref.watch(themeStyleProvider), isDark: isDark);
+    final colors = ref.watch(appColorsProvider);
     return GradientBackground(
       colors: colors,
       isDark: isDark,

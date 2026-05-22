@@ -18,7 +18,8 @@ class CalendarPage extends ConsumerStatefulWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage> {
   DateTime _focusedMonth = DateTime(DateTime.now().year, DateTime.now().month);
-  DateTime _selectedDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  DateTime _selectedDate =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   bool _showLunar = true;
 
   @override
@@ -26,21 +27,27 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final peopleAsync = ref.watch(peopleProvider);
     final placesAsync = ref.watch(placesProvider);
     final memoriesAsync = ref.watch(memoriesProvider);
-    final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
+    final colors = ref.watch(appColorsProvider);
     final people = peopleAsync.valueOrNull;
     final places = placesAsync.valueOrNull;
     final memories = memoriesAsync.valueOrNull;
 
     if (people == null || places == null || memories == null) {
-      if (peopleAsync.hasError) return Center(child: Text('${peopleAsync.error}'));
-      if (placesAsync.hasError) return Center(child: Text('${placesAsync.error}'));
-      if (memoriesAsync.hasError) return Center(child: Text('${memoriesAsync.error}'));
+      if (peopleAsync.hasError) {
+        return Center(child: Text('${peopleAsync.error}'));
+      }
+      if (placesAsync.hasError) {
+        return Center(child: Text('${placesAsync.error}'));
+      }
+      if (memoriesAsync.hasError) {
+        return Center(child: Text('${memoriesAsync.error}'));
+      }
       return const Center(child: CircularProgressIndicator());
     }
 
     final events = _monthEvents(people, places, memories, _focusedMonth);
-    final selectedEvents = events.where((event) => _sameDate(event.date, _selectedDate)).toList();
+    final selectedEvents =
+        events.where((event) => _sameDate(event.date, _selectedDate)).toList();
     final grouped = <int, List<_CalendarEvent>>{};
     for (final event in events) {
       grouped.putIfAbsent(event.date.day, () => []).add(event);
@@ -56,10 +63,18 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
               child: Row(
                 children: [
-                  Expanded(child: Text('日历', style: Theme.of(context).textTheme.headlineLarge)),
-                  _MonthButton(icon: Icons.chevron_left_rounded, colors: colors, onTap: () => _shiftMonth(-1)),
+                  Expanded(
+                      child: Text('日历',
+                          style: Theme.of(context).textTheme.headlineLarge)),
+                  _MonthButton(
+                      icon: Icons.chevron_left_rounded,
+                      colors: colors,
+                      onTap: () => _shiftMonth(-1)),
                   const SizedBox(width: 8),
-                  _MonthButton(icon: Icons.chevron_right_rounded, colors: colors, onTap: () => _shiftMonth(1)),
+                  _MonthButton(
+                      icon: Icons.chevron_right_rounded,
+                      colors: colors,
+                      onTap: () => _shiftMonth(1)),
                 ],
               ),
             ),
@@ -80,27 +95,54 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                       Container(
                         width: 44,
                         height: 44,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), gradient: colors.primaryGradient, boxShadow: [colors.avatarShadow]),
-                        child: const Icon(Icons.calendar_month_rounded, color: Colors.white, size: 22),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: colors.primaryGradient,
+                            boxShadow: [colors.avatarShadow]),
+                        child: const Icon(Icons.calendar_month_rounded,
+                            color: Colors.white, size: 22),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(DateFormat('yyyy年 M月', 'zh_CN').format(_focusedMonth), style: TextStyle(fontFamily: 'Outfit', fontSize: 22, fontWeight: FontWeight.w700, color: colors.textMain)),
+                            Text(
+                                DateFormat('yyyy年 M月', 'zh_CN')
+                                    .format(_focusedMonth),
+                                style: TextStyle(
+                                    fontFamily: 'Outfit',
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                    color: colors.textMain)),
                             const SizedBox(height: 4),
-                            Text(lunar.ganZhiZodiacText, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: colors.textMain)),
+                            Text(lunar.ganZhiZodiacText,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    color: colors.textMain)),
                             const SizedBox(height: 2),
-                            Text('${lunar.weekText} ${lunar.weekOfYearText}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colors.textSub)),
+                            Text('${lunar.weekText} ${lunar.weekOfYearText}',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: colors.textSub)),
                             const SizedBox(height: 2),
-                            Text(lunar.lunarText, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colors.primary)),
+                            Text(lunar.lunarText,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: colors.primary)),
                           ],
                         ),
                       ),
                       TextButton(
-                        onPressed: () => setState(() => _showLunar = !_showLunar),
-                        child: Text(_showLunar ? '隐藏农历' : '显示农历', style: TextStyle(color: colors.primary, fontWeight: FontWeight.w700)),
+                        onPressed: () =>
+                            setState(() => _showLunar = !_showLunar),
+                        child: Text(_showLunar ? '隐藏农历' : '显示农历',
+                            style: TextStyle(
+                                color: colors.primary,
+                                fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ),
@@ -125,9 +167,15 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               children: [
                 Icon(Icons.event_note_rounded, size: 20, color: colors.primary),
                 const SizedBox(width: 8),
-                Text('选中日期', style: TextStyle(fontFamily: 'Outfit', fontSize: 18, fontWeight: FontWeight.w600, color: colors.textMain)),
+                Text('选中日期',
+                    style: TextStyle(
+                        fontFamily: 'Outfit',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: colors.textMain)),
                 const SizedBox(width: 8),
-                Text(DateFormat('M月d日', 'zh_CN').format(_selectedDate), style: TextStyle(fontSize: 13, color: colors.textSub)),
+                Text(DateFormat('M月d日', 'zh_CN').format(_selectedDate),
+                    style: TextStyle(fontSize: 13, color: colors.textSub)),
               ],
             ),
           ),
@@ -136,7 +184,12 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: GlassCard(colors: colors, padding: const EdgeInsets.all(24), child: Center(child: Text('这一天还没有记录。', style: TextStyle(color: colors.textSub)))),
+              child: GlassCard(
+                  colors: colors,
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                      child: Text('这一天还没有记录。',
+                          style: TextStyle(color: colors.textSub)))),
             ),
           )
         else
@@ -145,7 +198,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             sliver: SliverList.separated(
               itemCount: selectedEvents.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (_, i) => _EventCard(event: selectedEvents[i], colors: colors),
+              itemBuilder: (_, i) =>
+                  _EventCard(event: selectedEvents[i], colors: colors),
             ),
           ),
         const SliverToBoxAdapter(child: SizedBox(height: 120)),
@@ -160,7 +214,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     });
   }
 
-  List<_CalendarEvent> _monthEvents(List<Person> people, List<Place> places, List<MemoryEvent> memories, DateTime month) {
+  List<_CalendarEvent> _monthEvents(List<Person> people, List<Place> places,
+      List<MemoryEvent> memories, DateTime month) {
     final events = <_CalendarEvent>[];
     for (final person in people) {
       if (person.birthday != null) {
@@ -173,7 +228,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               date: date,
               title: '${person.name} 的生日',
               subtitle: person.relationship,
-              subtitleLines: [lunar.ganZhiZodiacText, '${lunar.weekText} ${lunar.weekOfYearText}', lunar.lunarText],
+              subtitleLines: [
+                lunar.ganZhiZodiacText,
+                '${lunar.weekText} ${lunar.weekOfYearText}',
+                lunar.lunarText
+              ],
               type: _EventType.birthday,
               target: '/people/${person.id}',
             ));
@@ -190,7 +249,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               date: date,
               title: '${person.name} · ${anniversary.title}',
               subtitle: person.name,
-              subtitleLines: [lunar.ganZhiZodiacText, '${lunar.weekText} ${lunar.weekOfYearText}', lunar.lunarText],
+              subtitleLines: [
+                lunar.ganZhiZodiacText,
+                '${lunar.weekText} ${lunar.weekOfYearText}',
+                lunar.lunarText
+              ],
               type: _EventType.anniversary,
               target: '/people/${person.id}',
             ));
@@ -200,15 +263,25 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     }
     for (final memory in memories) {
       final date = DateTime.tryParse(memory.date);
-      if (date != null && date.year == month.year && date.month == month.month) {
-        final personNames = people.where((p) => memory.personIds.contains(p.id)).map((p) => p.name).toList();
+      if (date != null &&
+          date.year == month.year &&
+          date.month == month.month) {
+        final personNames = people
+            .where((p) => memory.personIds.contains(p.id))
+            .map((p) => p.name)
+            .toList();
         final place = places.where((p) => p.id == memory.placeId).firstOrNull;
         events.add(_CalendarEvent(
           date: date,
           title: memoryDisplayTitle(memory.title, memory.content),
-          subtitle: [personNames.join('、'), place?.name ?? ''].where((item) => item.isNotEmpty).join(' · '),
-          content: isManualMemoryTitle(memory.title) ? memory.content.trim() : '',
-          tags: [memory.mood, ...memory.tags].where((item) => item.trim().isNotEmpty).toList(),
+          subtitle: [personNames.join('、'), place?.name ?? '']
+              .where((item) => item.isNotEmpty)
+              .join(' · '),
+          content:
+              isManualMemoryTitle(memory.title) ? memory.content.trim() : '',
+          tags: [memory.mood, ...memory.tags]
+              .where((item) => item.trim().isNotEmpty)
+              .toList(),
           type: _EventType.memory,
           target: '/memories/${memory.id}',
         ));
@@ -222,7 +295,8 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     return events;
   }
 
-  bool _sameDate(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+  bool _sameDate(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
 }
 
 class _MonthButton extends StatelessWidget {
@@ -230,7 +304,8 @@ class _MonthButton extends StatelessWidget {
   final AppColors colors;
   final VoidCallback onTap;
 
-  const _MonthButton({required this.icon, required this.colors, required this.onTap});
+  const _MonthButton(
+      {required this.icon, required this.colors, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +314,10 @@ class _MonthButton extends StatelessWidget {
       child: Container(
         width: 40,
         height: 40,
-        decoration: BoxDecoration(color: colors.cardBg, borderRadius: BorderRadius.circular(14), border: Border.all(color: colors.line)),
+        decoration: BoxDecoration(
+            color: colors.cardBg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: colors.line)),
         child: Icon(icon, color: colors.primary, size: 24),
       ),
     );
@@ -254,7 +332,13 @@ class _CalendarGrid extends StatelessWidget {
   final AppColors colors;
   final ValueChanged<DateTime> onSelect;
 
-  const _CalendarGrid({required this.month, required this.selectedDate, required this.eventsByDay, required this.showLunar, required this.colors, required this.onSelect});
+  const _CalendarGrid(
+      {required this.month,
+      required this.selectedDate,
+      required this.eventsByDay,
+      required this.showLunar,
+      required this.colors,
+      required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -267,20 +351,31 @@ class _CalendarGrid extends StatelessWidget {
     return Column(
       children: [
         Row(
-          children: ['日', '一', '二', '三', '四', '五', '六'].map((label) => Expanded(child: Center(child: Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.textSub))))).toList(),
+          children: ['日', '一', '二', '三', '四', '五', '六']
+              .map((label) => Expanded(
+                  child: Center(
+                      child: Text(label,
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textSub)))))
+              .toList(),
         ),
         const SizedBox(height: 10),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: totalCells,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, mainAxisSpacing: 6, crossAxisSpacing: 6),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7, mainAxisSpacing: 6, crossAxisSpacing: 6),
           itemBuilder: (_, index) {
             final day = index - leading + 1;
             final inMonth = day >= 1 && day <= daysInMonth;
             if (!inMonth) return const SizedBox();
             final date = DateTime(month.year, month.month, day);
-            final selected = date.year == selectedDate.year && date.month == selectedDate.month && date.day == selectedDate.day;
+            final selected = date.year == selectedDate.year &&
+                date.month == selectedDate.month &&
+                date.day == selectedDate.day;
             final hasEvent = eventsByDay.containsKey(day);
             final lunar = showLunar ? getCalendarLunarInfo(date) : null;
             return GestureDetector(
@@ -288,17 +383,37 @@ class _CalendarGrid extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 5),
                 decoration: BoxDecoration(
-                  color: selected ? colors.primary : (hasEvent ? colors.softPurple : Colors.transparent),
+                  color: selected
+                      ? colors.primary
+                      : (hasEvent ? colors.softPurple : Colors.transparent),
                   borderRadius: BorderRadius.circular(12),
-                  border: hasEvent && !selected ? Border.all(color: colors.primary.withAlpha(64)) : null,
+                  border: hasEvent && !selected
+                      ? Border.all(color: colors.primary.withAlpha(64))
+                      : null,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('$day', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: selected ? Colors.white : (hasEvent ? colors.primary : colors.textMain))),
+                    Text('$day',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: selected
+                                ? Colors.white
+                                : (hasEvent
+                                    ? colors.primary
+                                    : colors.textMain))),
                     if (lunar != null) ...[
                       const SizedBox(height: 1),
-                      Text(lunar.cellText, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: selected ? Colors.white.withAlpha(215) : colors.textSub)),
+                      Text(lunar.cellText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
+                              color: selected
+                                  ? Colors.white.withAlpha(215)
+                                  : colors.textSub)),
                     ],
                   ],
                 ),
@@ -324,7 +439,8 @@ class _EventCard extends StatelessWidget {
       _EventType.anniversary => Icons.favorite_rounded,
       _EventType.memory => Icons.auto_stories_rounded,
     };
-    final tint = event.type == _EventType.memory ? colors.softPurple : colors.softOrange;
+    final tint =
+        event.type == _EventType.memory ? colors.softPurple : colors.softOrange;
 
     return GlassCard(
       colors: colors,
@@ -336,34 +452,67 @@ class _EventCard extends StatelessWidget {
           Container(
             width: 46,
             height: 46,
-            decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(
+                color: tint, borderRadius: BorderRadius.circular(16)),
             alignment: Alignment.center,
-            child: Text('${event.date.day}', style: TextStyle(fontFamily: 'Outfit', fontSize: 18, fontWeight: FontWeight.w700, color: colors.primary)),
+            child: Text('${event.date.day}',
+                style: TextStyle(
+                    fontFamily: 'Outfit',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: colors.primary)),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(event.title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colors.textMain)),
+                Text(event.title,
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: colors.textMain)),
                 if (event.subtitleLines.isNotEmpty) ...[
                   const SizedBox(height: 5),
                   ...event.subtitleLines.map((line) => Padding(
                         padding: const EdgeInsets.only(bottom: 2),
-                        child: Text(line, style: TextStyle(fontSize: 12, fontWeight: line == event.subtitleLines.first ? FontWeight.w600 : FontWeight.w500, color: line == event.subtitleLines.first ? colors.textMain : colors.textSub)),
+                        child: Text(line,
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: line == event.subtitleLines.first
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: line == event.subtitleLines.first
+                                    ? colors.textMain
+                                    : colors.textSub)),
                       )),
                 ] else ...[
                   if (event.subtitle.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(event.subtitle, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colors.textSub)),
+                    Text(event.subtitle,
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: colors.textSub)),
                   ],
                   if (event.content.isNotEmpty) ...[
                     const SizedBox(height: 6),
-                    Text(event.content, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, height: 1.45, color: colors.textMain)),
+                    Text(event.content,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 13,
+                            height: 1.45,
+                            color: colors.textMain)),
                   ],
                   if (event.tags.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    Wrap(spacing: 6, runSpacing: 6, children: event.tags.map((tag) => _Tag(label: tag, colors: colors)).toList()),
+                    Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: event.tags
+                            .map((tag) => _Tag(label: tag, colors: colors))
+                            .toList()),
                   ],
                 ],
               ],
@@ -386,8 +535,13 @@ class _Tag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-      decoration: BoxDecoration(color: colors.softPurple, borderRadius: BorderRadius.circular(999)),
-      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: colors.primary)),
+      decoration: BoxDecoration(
+          color: colors.softPurple, borderRadius: BorderRadius.circular(999)),
+      child: Text(label,
+          style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: colors.primary)),
     );
   }
 }

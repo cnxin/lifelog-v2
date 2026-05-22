@@ -16,9 +16,8 @@ class PersonDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final peopleAsync = ref.watch(peopleProvider);
-    final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(style, isDark: isDark);
+    final colors = ref.watch(appColorsProvider);
 
     return peopleAsync.when(
       loading: () =>

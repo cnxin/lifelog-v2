@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/database_helper.dart';
 import '../models/person.dart';
@@ -13,6 +14,29 @@ final notificationServiceProvider =
 final themeStyleProvider =
     StateProvider<AppThemeStyle>((ref) => AppThemeStyle.classic);
 final themeModeProvider = StateProvider<bool>((ref) => false);
+final dynamicColorEnabledProvider = StateProvider<bool>((ref) => false);
+final dynamicLightColorSchemeProvider =
+    StateProvider<ColorScheme?>((ref) => null);
+final dynamicDarkColorSchemeProvider =
+    StateProvider<ColorScheme?>((ref) => null);
+final appColorsProvider = Provider<AppColors>((ref) {
+  final style = ref.watch(themeStyleProvider);
+  final isDark = ref.watch(themeModeProvider);
+  final base = AppColors.fromStyle(style, isDark: isDark);
+  if (!ref.watch(dynamicColorEnabledProvider)) return base;
+
+  final dynamicScheme = isDark
+      ? ref.watch(dynamicDarkColorSchemeProvider)
+      : ref.watch(dynamicLightColorSchemeProvider);
+  if (dynamicScheme == null) return base;
+
+  final seededScheme = ColorScheme.fromSeed(
+    seedColor: dynamicScheme.primary,
+    brightness: isDark ? Brightness.dark : Brightness.light,
+    dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
+  );
+  return base.harmonizedWith(seededScheme, isDark: isDark);
+});
 final notificationsEnabledProvider = StateProvider<bool>((ref) => false);
 final contactRemindersEnabledProvider = StateProvider<bool>((ref) => false);
 final memoryReviewRemindersEnabledProvider =
@@ -50,6 +74,8 @@ Future<void> loadPersistedPreferences(WidgetRef ref) async {
   ref.read(themeStyleProvider.notifier).state =
       themeStyleFromName(settings.themeStyle);
   ref.read(themeModeProvider.notifier).state = settings.themeMode;
+  ref.read(dynamicColorEnabledProvider.notifier).state =
+      settings.dynamicColorEnabled;
   ref.read(customRelationshipsProvider.notifier).state =
       settings.customRelationships;
   ref.read(customMoodsProvider.notifier).state = settings.customMoods;
@@ -72,6 +98,7 @@ Future<void> saveCurrentPreferences(WidgetRef ref) async {
   await ref.read(databaseProvider).saveSettings(AppSettingsSnapshot(
         themeStyle: ref.read(themeStyleProvider).name,
         themeMode: ref.read(themeModeProvider),
+        dynamicColorEnabled: ref.read(dynamicColorEnabledProvider),
         customRelationships: ref.read(customRelationshipsProvider),
         customMoods: ref.read(customMoodsProvider),
       ));

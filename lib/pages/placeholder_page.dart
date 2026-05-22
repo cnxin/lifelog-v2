@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
-import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
 
 class PlaceholderPage extends ConsumerWidget {
@@ -18,8 +17,7 @@ class PlaceholderPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
+    final colors = ref.watch(appColorsProvider);
     final theme = Theme.of(context);
 
     return CustomScrollView(
@@ -51,7 +49,8 @@ class PlaceholderPage extends ConsumerWidget {
                         color: colors.softPurple,
                         borderRadius: BorderRadius.circular(24),
                       ),
-                      child: Icon(icon, size: 36, color: colors.primary.withAlpha(120)),
+                      child: Icon(icon,
+                          size: 36, color: colors.primary.withAlpha(120)),
                     ),
                     const SizedBox(height: 20),
                     Text(

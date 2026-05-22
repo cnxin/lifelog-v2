@@ -27,8 +27,7 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
     final searchQuery = ref.watch(searchQueryProvider);
-    final style = ref.watch(themeStyleProvider);
-    final colors = AppColors.fromStyle(style, isDark: ref.watch(themeModeProvider));
+    final colors = ref.watch(appColorsProvider);
     final theme = Theme.of(context);
 
     return Stack(
@@ -59,21 +58,27 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.search, size: 20, color: colors.textSub),
+                              Icon(Icons.search,
+                                  size: 20, color: colors.textSub),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextField(
                                   controller: _searchController,
-                                  style: TextStyle(fontSize: 15, color: colors.textMain),
+                                  style: TextStyle(
+                                      fontSize: 15, color: colors.textMain),
                                   decoration: InputDecoration(
                                     hintText: '搜索人物...',
-                                    hintStyle: TextStyle(color: colors.textSub, fontSize: 15),
+                                    hintStyle: TextStyle(
+                                        color: colors.textSub, fontSize: 15),
                                     border: InputBorder.none,
                                     filled: false,
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 14),
                                   ),
                                   onChanged: (v) {
-                                    ref.read(searchQueryProvider.notifier).state = v;
+                                    ref
+                                        .read(searchQueryProvider.notifier)
+                                        .state = v;
                                     ref.read(peopleProvider.notifier).search(v);
                                   },
                                 ),
@@ -82,10 +87,15 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
                                 GestureDetector(
                                   onTap: () {
                                     _searchController.clear();
-                                    ref.read(searchQueryProvider.notifier).state = '';
-                                    ref.read(peopleProvider.notifier).search('');
+                                    ref
+                                        .read(searchQueryProvider.notifier)
+                                        .state = '';
+                                    ref
+                                        .read(peopleProvider.notifier)
+                                        .search('');
                                   },
-                                  child: Icon(Icons.close, size: 18, color: colors.textSub),
+                                  child: Icon(Icons.close,
+                                      size: 18, color: colors.textSub),
                                 ),
                             ],
                           ),
@@ -97,7 +107,6 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
                 ),
               ),
             ),
-
             Expanded(
               child: peopleAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -108,11 +117,15 @@ class _PeopleListPageState extends ConsumerState<PeopleListPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.people_outline, size: 64, color: colors.textSub.withAlpha(100)),
+                          Icon(Icons.people_outline,
+                              size: 64, color: colors.textSub.withAlpha(100)),
                           const SizedBox(height: 16),
                           Text(
-                            searchQuery.isNotEmpty ? '没有找到匹配的人物' : '还没有人物，点击 + 添加',
-                            style: TextStyle(color: colors.textSub, fontSize: 15),
+                            searchQuery.isNotEmpty
+                                ? '没有找到匹配的人物'
+                                : '还没有人物，点击 + 添加',
+                            style:
+                                TextStyle(color: colors.textSub, fontSize: 15),
                           ),
                         ],
                       ),
@@ -154,7 +167,8 @@ class _PersonCard extends ConsumerWidget {
   final AppColors colors;
   final int colorVariant;
 
-  const _PersonCard({required this.person, required this.colors, required this.colorVariant});
+  const _PersonCard(
+      {required this.person, required this.colors, required this.colorVariant});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -180,7 +194,10 @@ class _PersonCard extends ConsumerWidget {
                   children: [
                     Text(
                       person.name,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.textMain),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: colors.textMain),
                     ),
                     if (person.nickname.isNotEmpty) ...[
                       const SizedBox(width: 6),
@@ -191,7 +208,8 @@ class _PersonCard extends ConsumerWidget {
                     ],
                     if (person.favorite) ...[
                       const SizedBox(width: 6),
-                      const Icon(Icons.star_rounded, size: 16, color: Color(0xFFFDCB6E)),
+                      const Icon(Icons.star_rounded,
+                          size: 16, color: Color(0xFFFDCB6E)),
                     ],
                   ],
                 ),
@@ -199,14 +217,19 @@ class _PersonCard extends ConsumerWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: _relationshipColor(person.relationship, colors),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
                         person.relationship,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _relationshipTextColor(person.relationship, colors)),
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: _relationshipTextColor(
+                                person.relationship, colors)),
                       ),
                     ),
                     if (person.birthday != null) ...[
@@ -232,14 +255,22 @@ class _PersonCard extends ConsumerWidget {
                         .asMap()
                         .entries
                         .map((entry) => Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: entry.key.isEven ? colors.softPurple : colors.softOrange,
+                                color: entry.key.isEven
+                                    ? colors.softPurple
+                                    : colors.softOrange,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
                                 entry.value,
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: entry.key.isEven ? colors.primary : colors.secondary),
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: entry.key.isEven
+                                        ? colors.primary
+                                        : colors.secondary),
                               ),
                             ))
                         .toList(),
@@ -248,7 +279,8 @@ class _PersonCard extends ConsumerWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, size: 20, color: colors.textSub.withAlpha(100)),
+          Icon(Icons.chevron_right,
+              size: 20, color: colors.textSub.withAlpha(100)),
         ],
       ),
     );

@@ -66,6 +66,51 @@ class AppColors {
         colors: gradientColors,
       );
 
+  AppColors harmonizedWith(ColorScheme scheme, {required bool isDark}) {
+    final primaryTone = scheme.primary;
+    final secondaryTone = scheme.secondary;
+    final tertiaryTone = scheme.tertiary;
+
+    return AppColors(
+      primary: primaryTone,
+      primaryLight: tertiaryTone,
+      secondary: secondaryTone,
+      bgColor: isDark ? scheme.surface : scheme.surfaceContainerLowest,
+      cardBg: (isDark ? scheme.surfaceContainerHigh : Colors.white)
+          .withAlpha(isDark ? 224 : 242),
+      cardSolid: isDark ? scheme.surfaceContainerHigh : Colors.white,
+      textMain: scheme.onSurface,
+      textSub: scheme.onSurfaceVariant,
+      line: scheme.outlineVariant.withAlpha(isDark ? 64 : 44),
+      softPurple: primaryTone.withAlpha(isDark ? 54 : 28),
+      softOrange: secondaryTone.withAlpha(isDark ? 48 : 34),
+      shadow: BoxShadow(
+        color: isDark ? const Color(0x52000000) : primaryTone.withAlpha(18),
+        blurRadius: isDark ? 26 : 22,
+        offset: const Offset(0, 10),
+      ),
+      pressShadow: BoxShadow(
+        color: isDark ? const Color(0x66000000) : primaryTone.withAlpha(24),
+        blurRadius: isDark ? 14 : 14,
+        offset: const Offset(0, 5),
+      ),
+      avatarShadow: BoxShadow(
+        color: primaryTone.withAlpha(isDark ? 92 : 64),
+        blurRadius: 24,
+        offset: const Offset(0, 10),
+      ),
+      fabShadow: BoxShadow(
+        color: primaryTone.withAlpha(isDark ? 82 : 56),
+        blurRadius: 22,
+        offset: const Offset(0, 10),
+      ),
+      gradientColors: [
+        secondaryTone,
+        tertiaryTone,
+      ],
+    );
+  }
+
   static const classic = AppColors(
     primary: Color(0xFF7C8CF8),
     primaryLight: Color(0xFFAEB8FF),

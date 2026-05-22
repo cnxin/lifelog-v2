@@ -68,9 +68,8 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(style, isDark: isDark);
+    final colors = ref.watch(appColorsProvider);
 
     return GradientBackground(
       colors: colors,
@@ -85,24 +84,34 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back_ios_new, size: 20, color: colors.textMain),
+                      icon: Icon(Icons.arrow_back_ios_new,
+                          size: 20, color: colors.textMain),
                       onPressed: () => context.pop(),
                     ),
                     const Spacer(),
                     Text(
                       isEditing ? '编辑人物' : '新建人物',
-                      style: TextStyle(fontFamily: 'Outfit', fontSize: 18, fontWeight: FontWeight.w600, color: colors.textMain),
+                      style: TextStyle(
+                          fontFamily: 'Outfit',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: colors.textMain),
                     ),
                     const Spacer(),
                     GestureDetector(
                       onTap: _save,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           gradient: colors.primaryGradient,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Text('保存', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                        child: const Text('保存',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -124,15 +133,19 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                         padding: EdgeInsets.zero,
                         child: TextFormField(
                           controller: _nameController,
-                          style: TextStyle(fontSize: 15, color: colors.textMain),
+                          style:
+                              TextStyle(fontSize: 15, color: colors.textMain),
                           decoration: InputDecoration(
                             hintText: '输入姓名',
-                            prefixIcon: Icon(Icons.person, size: 20, color: colors.textSub),
+                            prefixIcon: Icon(Icons.person,
+                                size: 20, color: colors.textSub),
                             border: InputBorder.none,
                             filled: false,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
                           ),
-                          validator: (v) => (v == null || v.trim().isEmpty) ? '请输入姓名' : null,
+                          validator: (v) =>
+                              (v == null || v.trim().isEmpty) ? '请输入姓名' : null,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -145,13 +158,16 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                         padding: EdgeInsets.zero,
                         child: TextFormField(
                           controller: _nicknameController,
-                          style: TextStyle(fontSize: 15, color: colors.textMain),
+                          style:
+                              TextStyle(fontSize: 15, color: colors.textMain),
                           decoration: InputDecoration(
                             hintText: '输入昵称（可选）',
-                            prefixIcon: Icon(Icons.badge, size: 20, color: colors.textSub),
+                            prefixIcon: Icon(Icons.badge,
+                                size: 20, color: colors.textSub),
                             border: InputBorder.none,
                             filled: false,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
                           ),
                         ),
                       ),
@@ -162,7 +178,8 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                       const SizedBox(height: 8),
                       Consumer(
                         builder: (context, ref, child) {
-                          final relationships = ref.watch(customRelationshipsProvider);
+                          final relationships =
+                              ref.watch(customRelationshipsProvider);
                           return Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -172,25 +189,34 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                                 onTap: () => setState(() => _relationship = r),
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 160),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 10),
                                   decoration: BoxDecoration(
-                                    gradient: selected ? colors.primaryGradient : null,
+                                    gradient: selected
+                                        ? colors.primaryGradient
+                                        : null,
                                     color: selected ? null : colors.cardBg,
                                     borderRadius: BorderRadius.circular(999),
-                                border: selected ? null : Border.all(color: colors.line),
-                                boxShadow: selected ? [colors.fabShadow] : [colors.shadow],
-                              ),
-                              child: Text(
-                                r,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: selected ? Colors.white : colors.textMain,
+                                    border: selected
+                                        ? null
+                                        : Border.all(color: colors.line),
+                                    boxShadow: selected
+                                        ? [colors.fabShadow]
+                                        : [colors.shadow],
+                                  ),
+                                  child: Text(
+                                    r,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: selected
+                                          ? Colors.white
+                                          : colors.textMain,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
                           );
                         },
                       ),
@@ -211,27 +237,35 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                                 _birthday ?? '选择日期',
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: _birthday != null ? colors.textMain : colors.textSub,
+                                  color: _birthday != null
+                                      ? colors.textMain
+                                      : colors.textSub,
                                 ),
                               ),
                             ),
                             if (_birthday != null)
                               GestureDetector(
-                                onTap: () => setState(() => _birthdayIsLunar = !_birthdayIsLunar),
+                                onTap: () => setState(
+                                    () => _birthdayIsLunar = !_birthdayIsLunar),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(
                                     color: colors.softPurple,
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   child: Text(
                                     _birthdayIsLunar ? '农历' : '公历',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.primary),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: colors.primary),
                                   ),
                                 ),
                               ),
                             const SizedBox(width: 4),
-                            Icon(Icons.chevron_right, size: 20, color: colors.textSub),
+                            Icon(Icons.chevron_right,
+                                size: 20, color: colors.textSub),
                           ],
                         ),
                       ),
@@ -244,12 +278,18 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                         child: Row(
                           children: [
                             Icon(
-                              _favorite ? Icons.star_rounded : Icons.star_outline_rounded,
+                              _favorite
+                                  ? Icons.star_rounded
+                                  : Icons.star_outline_rounded,
                               size: 22,
-                              color: _favorite ? const Color(0xFFFDCB6E) : colors.textSub,
+                              color: _favorite
+                                  ? const Color(0xFFFDCB6E)
+                                  : colors.textSub,
                             ),
                             const SizedBox(width: 12),
-                            Text('收藏', style: TextStyle(fontSize: 15, color: colors.textMain)),
+                            Text('收藏',
+                                style: TextStyle(
+                                    fontSize: 15, color: colors.textMain)),
                             const Spacer(),
                             AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -260,11 +300,15 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                                 borderRadius: BorderRadius.circular(13),
                                 color: _favorite ? colors.primary : colors.line,
                               ),
-                              alignment: _favorite ? Alignment.centerRight : Alignment.centerLeft,
+                              alignment: _favorite
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
                               child: Container(
                                 width: 20,
                                 height: 20,
-                                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle),
                               ),
                             ),
                           ],
@@ -273,11 +317,22 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                       const SizedBox(height: 24),
 
                       // 喜好
-                      _GroupEditor(title: '喜好', icon: Icons.favorite_rounded, groups: _preferences, colors: colors, onChanged: () => setState(() {})),
+                      _GroupEditor(
+                          title: '喜好',
+                          icon: Icons.favorite_rounded,
+                          groups: _preferences,
+                          colors: colors,
+                          onChanged: () => setState(() {})),
                       const SizedBox(height: 16),
 
                       // 禁忌
-                      _GroupEditor(title: '禁忌', icon: Icons.block_rounded, groups: _dislikes, colors: colors, isDislike: true, onChanged: () => setState(() {})),
+                      _GroupEditor(
+                          title: '禁忌',
+                          icon: Icons.block_rounded,
+                          groups: _dislikes,
+                          colors: colors,
+                          isDislike: true,
+                          onChanged: () => setState(() {})),
                       const SizedBox(height: 24),
 
                       // 备注
@@ -288,17 +343,20 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
                         padding: EdgeInsets.zero,
                         child: TextFormField(
                           controller: _notesController,
-                          style: TextStyle(fontSize: 15, color: colors.textMain),
+                          style:
+                              TextStyle(fontSize: 15, color: colors.textMain),
                           maxLines: 3,
                           decoration: InputDecoration(
                             hintText: '添加备注...',
                             prefixIcon: Padding(
                               padding: const EdgeInsets.only(bottom: 40),
-                              child: Icon(Icons.note, size: 20, color: colors.textSub),
+                              child: Icon(Icons.note,
+                                  size: 20, color: colors.textSub),
                             ),
                             border: InputBorder.none,
                             filled: false,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
                           ),
                         ),
                       ),
@@ -314,7 +372,7 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
   }
 
   Future<void> _pickBirthday() async {
-    final colors = AppColors.fromStyle(ref.read(themeStyleProvider), isDark: ref.read(themeModeProvider));
+    final colors = ref.read(appColorsProvider);
     final initial = _birthday != null ? DateTime.tryParse(_birthday!) : null;
     await showLifeLogDateTimePicker(
       context: context,
@@ -323,7 +381,8 @@ class _PersonFormPageState extends ConsumerState<PersonFormPage> {
       includeTime: false,
       onConfirm: (date, _) {
         setState(() {
-          _birthday = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+          _birthday =
+              '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
         });
       },
     );
@@ -358,13 +417,15 @@ class _FieldLabel extends StatelessWidget {
   final AppColors colors;
   final bool required;
 
-  const _FieldLabel({required this.label, required this.colors, this.required = false});
+  const _FieldLabel(
+      {required this.label, required this.colors, this.required = false});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       required ? '$label *' : label,
-      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub),
+      style: TextStyle(
+          fontSize: 13, fontWeight: FontWeight.w600, color: colors.textSub),
     );
   }
 }
@@ -395,14 +456,20 @@ class _GroupEditor extends StatelessWidget {
           children: [
             Icon(icon, size: 18, color: colors.primary),
             const SizedBox(width: 8),
-            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.primary)),
+            Text(title,
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: colors.primary)),
             const Spacer(),
             GestureDetector(
               onTap: () => _addGroup(context),
               child: Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(color: colors.softPurple, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                    color: colors.softPurple,
+                    borderRadius: BorderRadius.circular(10)),
                 child: Icon(Icons.add, size: 18, color: colors.primary),
               ),
             ),
@@ -411,7 +478,8 @@ class _GroupEditor extends StatelessWidget {
         if (groups.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Text('点击 + 添加$title', style: TextStyle(fontSize: 13, color: colors.textSub)),
+            child: Text('点击 + 添加$title',
+                style: TextStyle(fontSize: 13, color: colors.textSub)),
           ),
         ...groups.asMap().entries.map((entry) {
           final idx = entry.key;
@@ -426,11 +494,19 @@ class _GroupEditor extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(group.category, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.textMain)),
+                      Text(group.category,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textMain)),
                       const Spacer(),
                       GestureDetector(
-                        onTap: () { groups.removeAt(idx); onChanged(); },
-                        child: Icon(Icons.close, size: 16, color: colors.textSub),
+                        onTap: () {
+                          groups.removeAt(idx);
+                          onChanged();
+                        },
+                        child:
+                            Icon(Icons.close, size: 16, color: colors.textSub),
                       ),
                     ],
                   ),
@@ -440,36 +516,58 @@ class _GroupEditor extends StatelessWidget {
                     runSpacing: 6,
                     children: [
                       ...group.items.map((item) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: isDislike ? colors.softOrange : colors.softPurple,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(item, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isDislike ? const Color(0xFFE17055) : colors.primary)),
-                            const SizedBox(width: 4),
-                            GestureDetector(
-                              onTap: () {
-                                groups[idx] = PreferenceGroup(category: group.category, items: [...group.items]..remove(item));
-                                if (groups[idx].items.isEmpty) groups.removeAt(idx);
-                                onChanged();
-                              },
-                              child: Icon(Icons.close, size: 12, color: isDislike ? const Color(0xFFE17055) : colors.primary),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isDislike
+                                  ? colors.softOrange
+                                  : colors.softPurple,
+                              borderRadius: BorderRadius.circular(999),
                             ),
-                          ],
-                        ),
-                      )),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(item,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDislike
+                                            ? const Color(0xFFE17055)
+                                            : colors.primary)),
+                                const SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    groups[idx] = PreferenceGroup(
+                                        category: group.category,
+                                        items: [...group.items]..remove(item));
+                                    if (groups[idx].items.isEmpty) {
+                                      groups.removeAt(idx);
+                                    }
+                                    onChanged();
+                                  },
+                                  child: Icon(Icons.close,
+                                      size: 12,
+                                      color: isDislike
+                                          ? const Color(0xFFE17055)
+                                          : colors.primary),
+                                ),
+                              ],
+                            ),
+                          )),
                       GestureDetector(
                         onTap: () => _addItem(context, idx),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             border: Border.all(color: colors.line),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: Text('+', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.textSub)),
+                          child: Text('+',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.textSub)),
                         ),
                       ),
                     ],
@@ -494,18 +592,32 @@ class _GroupEditor extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: catCtrl, decoration: const InputDecoration(labelText: '分类名称'), autofocus: true),
+            TextField(
+                controller: catCtrl,
+                decoration: const InputDecoration(labelText: '分类名称'),
+                autofocus: true),
             const SizedBox(height: 12),
-            TextField(controller: itemCtrl, decoration: const InputDecoration(labelText: '项目（逗号分隔）', hintText: '例: 蓝色, 黑色')),
+            TextField(
+                controller: itemCtrl,
+                decoration: const InputDecoration(
+                    labelText: '项目（逗号分隔）', hintText: '例: 蓝色, 黑色')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
           TextButton(
             onPressed: () {
               final cat = catCtrl.text.trim();
-              final items = itemCtrl.text.split(RegExp(r'[,，]')).map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
-              if (cat.isNotEmpty && items.isNotEmpty) { groups.add(PreferenceGroup(category: cat, items: items)); onChanged(); }
+              final items = itemCtrl.text
+                  .split(RegExp(r'[,，]'))
+                  .map((s) => s.trim())
+                  .where((s) => s.isNotEmpty)
+                  .toList();
+              if (cat.isNotEmpty && items.isNotEmpty) {
+                groups.add(PreferenceGroup(category: cat, items: items));
+                onChanged();
+              }
               Navigator.pop(ctx);
             },
             child: const Text('添加'),
@@ -528,16 +640,27 @@ class _GroupEditor extends StatelessWidget {
           autofocus: true,
           onSubmitted: (_) {
             final text = ctrl.text.trim();
-            if (text.isNotEmpty) { groups[groupIdx] = PreferenceGroup(category: groups[groupIdx].category, items: [...groups[groupIdx].items, text]); onChanged(); }
+            if (text.isNotEmpty) {
+              groups[groupIdx] = PreferenceGroup(
+                  category: groups[groupIdx].category,
+                  items: [...groups[groupIdx].items, text]);
+              onChanged();
+            }
             Navigator.pop(ctx);
           },
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
           TextButton(
             onPressed: () {
               final text = ctrl.text.trim();
-              if (text.isNotEmpty) { groups[groupIdx] = PreferenceGroup(category: groups[groupIdx].category, items: [...groups[groupIdx].items, text]); onChanged(); }
+              if (text.isNotEmpty) {
+                groups[groupIdx] = PreferenceGroup(
+                    category: groups[groupIdx].category,
+                    items: [...groups[groupIdx].items, text]);
+                onChanged();
+              }
               Navigator.pop(ctx);
             },
             child: const Text('添加'),

@@ -285,12 +285,14 @@ class LifeLogState {
 class AppSettingsSnapshot {
   final String themeStyle;
   final bool themeMode;
+  final bool dynamicColorEnabled;
   final List<String> customRelationships;
   final List<String> customMoods;
 
   const AppSettingsSnapshot({
     this.themeStyle = 'classic',
     this.themeMode = false,
+    this.dynamicColorEnabled = false,
     this.customRelationships = const ['朋友', '家人', '同事', '同学', '恋人', '其他'],
     this.customMoods = const ['日常', '开心', '轻松', '愉快', '感动', '难忘'],
   });
@@ -298,6 +300,7 @@ class AppSettingsSnapshot {
   Map<String, dynamic> toJson() => {
         'themeStyle': themeStyle,
         'themeMode': themeMode,
+        'dynamicColorEnabled': dynamicColorEnabled,
         'customRelationships': customRelationships,
         'customMoods': customMoods,
       };
@@ -309,6 +312,8 @@ class AppSettingsSnapshot {
           map['theme']?.toString() ??
           'classic',
       themeMode: map['themeMode'] == true || map['isDarkMode'] == true,
+      dynamicColorEnabled:
+          map['dynamicColorEnabled'] == true || map['useDynamicColor'] == true,
       customRelationships: (map['customRelationships'] as List?)
               ?.map((item) => item.toString())
               .toList() ??

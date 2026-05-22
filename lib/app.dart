@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:go_router/go_router.dart';
 import 'providers/providers.dart';
 import 'theme/app_theme.dart';
@@ -34,7 +36,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           transitionDuration: const Duration(milliseconds: 220),
           reverseTransitionDuration: const Duration(milliseconds: 180),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
+            final curved = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+                reverseCurve: Curves.easeInCubic);
             return ScaleTransition(
               alignment: Alignment.topRight,
               scale: Tween<double>(begin: 0.86, end: 1).animate(curved),
@@ -64,12 +69,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: ':id',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (_, state) => PersonDetailPage(personId: state.pathParameters['id']!),
+                  builder: (_, state) =>
+                      PersonDetailPage(personId: state.pathParameters['id']!),
                   routes: [
                     GoRoute(
                       path: 'edit',
                       parentNavigatorKey: _rootNavigatorKey,
-                      builder: (_, state) => PersonFormPage(personId: state.pathParameters['id']!),
+                      builder: (_, state) =>
+                          PersonFormPage(personId: state.pathParameters['id']!),
                     ),
                   ],
                 ),
@@ -89,12 +96,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: ':id',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (_, state) => PlaceDetailPage(placeId: state.pathParameters['id']!),
+                  builder: (_, state) =>
+                      PlaceDetailPage(placeId: state.pathParameters['id']!),
                   routes: [
                     GoRoute(
                       path: 'edit',
                       parentNavigatorKey: _rootNavigatorKey,
-                      builder: (_, state) => PlaceFormPage(placeId: state.pathParameters['id']!),
+                      builder: (_, state) =>
+                          PlaceFormPage(placeId: state.pathParameters['id']!),
                     ),
                   ],
                 ),
@@ -114,12 +123,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: ':id',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (_, state) => MemoryDetailPage(memoryId: state.pathParameters['id']!),
+                  builder: (_, state) =>
+                      MemoryDetailPage(memoryId: state.pathParameters['id']!),
                   routes: [
                     GoRoute(
                       path: 'edit',
                       parentNavigatorKey: _rootNavigatorKey,
-                      builder: (_, state) => MemoryFormPage(memoryId: state.pathParameters['id']!),
+                      builder: (_, state) =>
+                          MemoryFormPage(memoryId: state.pathParameters['id']!),
                     ),
                   ],
                 ),
@@ -133,7 +144,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/settings', builder: (_, __) => const SettingsPage()),
+            GoRoute(
+                path: '/settings', builder: (_, __) => const SettingsPage()),
           ]),
         ],
       ),
@@ -162,31 +174,72 @@ class _LifeLogAppState extends ConsumerState<LifeLogApp> {
 
   @override
   Widget build(BuildContext context) {
-    final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(style, isDark: isDark);
+    final colors = ref.watch(appColorsProvider);
     final router = ref.watch(routerProvider);
 
-    if (!_ready) {
-      return MaterialApp(
-        title: 'LifeLog',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.build(colors, isDark: isDark),
-        home: GradientBackground(
-          colors: colors,
-          isDark: isDark,
-          child: const Scaffold(body: Center(child: CircularProgressIndicator())),
-        ),
-      );
-    }
+    return DynamicColorBuilder(
+      builder: (lightDynamic, darkDynamic) {
+        _rememberDynamicSchemes(ref, lightDynamic, darkDynamic);
+        final theme = AppTheme.build(colors, isDark: isDark);
 
-    return MaterialApp.router(
-      title: 'LifeLog',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.build(colors, isDark: isDark),
-      routerConfig: router,
+        if (!_ready) {
+          return MaterialApp(
+            title: 'LifeLog',
+            debugShowCheckedModeBanner: false,
+            theme: theme,
+            builder: _systemUiBuilder(isDark),
+            home: GradientBackground(
+              colors: colors,
+              isDark: isDark,
+              child: const Scaffold(
+                  body: Center(child: CircularProgressIndicator())),
+            ),
+          );
+        }
+
+        return MaterialApp.router(
+          title: 'LifeLog',
+          debugShowCheckedModeBanner: false,
+          theme: theme,
+          builder: _systemUiBuilder(isDark),
+          routerConfig: router,
+        );
+      },
     );
   }
+}
+
+void _rememberDynamicSchemes(
+  WidgetRef ref,
+  ColorScheme? lightDynamic,
+  ColorScheme? darkDynamic,
+) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (ref.read(dynamicLightColorSchemeProvider) != lightDynamic) {
+      ref.read(dynamicLightColorSchemeProvider.notifier).state = lightDynamic;
+    }
+    if (ref.read(dynamicDarkColorSchemeProvider) != darkDynamic) {
+      ref.read(dynamicDarkColorSchemeProvider.notifier).state = darkDynamic;
+    }
+  });
+}
+
+TransitionBuilder _systemUiBuilder(bool isDark) {
+  return (context, child) {
+    final iconBrightness = isDark ? Brightness.light : Brightness.dark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: iconBrightness,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: iconBrightness,
+        systemNavigationBarDividerColor: Colors.transparent.withAlpha(1),
+        systemNavigationBarContrastEnforced: false,
+      ),
+      child: child ?? const SizedBox.shrink(),
+    );
+  };
 }
 
 class _AppShell extends ConsumerWidget {
@@ -195,9 +248,8 @@ class _AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final style = ref.watch(themeStyleProvider);
     final isDark = ref.watch(themeModeProvider);
-    final colors = AppColors.fromStyle(style, isDark: isDark);
+    final colors = ref.watch(appColorsProvider);
 
     return GradientBackground(
       colors: colors,
@@ -208,7 +260,8 @@ class _AppShell extends ConsumerWidget {
           currentIndex: navigationShell.currentIndex,
           colors: colors,
           onTap: (index) {
-            navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
+            navigationShell.goBranch(index,
+                initialLocation: index == navigationShell.currentIndex);
           },
         ),
       ),

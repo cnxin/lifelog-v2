@@ -12,8 +12,8 @@ class AccountPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = AppColors.fromStyle(ref.watch(themeStyleProvider),
-        isDark: ref.watch(themeModeProvider));
+    final isDark = ref.watch(themeModeProvider);
+    final colors = ref.watch(appColorsProvider);
     final people = ref.watch(peopleProvider).valueOrNull ?? [];
     final places = ref.watch(placesProvider).valueOrNull ?? [];
     final memories = ref.watch(memoriesProvider).valueOrNull ?? [];
@@ -24,7 +24,7 @@ class AccountPage extends ConsumerWidget {
 
     return GradientBackground(
       colors: colors,
-      isDark: ref.watch(themeModeProvider),
+      isDark: isDark,
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
